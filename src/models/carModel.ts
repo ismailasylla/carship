@@ -6,7 +6,9 @@ const carSchema = new Schema<ICar>({
   make: { type: String, required: true },
   model: { type: String, required: true },
   year: { type: Number, required: true },
+  price: { type: Number, required: true },
   vin: { type: String, required: true, unique: true },
+  currency: { type: String, required: true, default: 'AED' },
   shippingStatus: { 
     type: String, 
     enum: Object.values(ShippingStatus),  // Use the enum values here
@@ -17,3 +19,4 @@ const carSchema = new Schema<ICar>({
 const Car: Model<ICar> = mongoose.model<ICar>('Car', carSchema);
 
 export default Car;
+

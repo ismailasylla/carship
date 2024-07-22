@@ -23,10 +23,10 @@ export const getCars = async (req: Request, res: Response) => {
 };
 
 export const addCar = async (req: Request, res: Response) => {
-  const { make, model, year, vin, shippingStatus } = req.body;
+  const { make, model, year, vin, shippingStatus, price, currency } = req.body;
 
   try {
-    const newCar: ICar = new Car({ make, model, year, vin, shippingStatus });
+    const newCar: ICar = new Car({ make, model, year, vin, shippingStatus, price, currency: currency || 'AED' }); 
     const savedCar: ICar = await newCar.save();
     res.status(201).json(savedCar);
   } catch (error) {
@@ -37,10 +37,10 @@ export const addCar = async (req: Request, res: Response) => {
 
 export const updateCarStatus = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { shippingStatus } = req.body;
+  const { shippingStatus, price, currency } = req.body;
 
   try {
-    const updatedCar: ICar | null = await Car.findByIdAndUpdate(id, { shippingStatus }, { new: true });
+    const updatedCar: ICar | null = await Car.findByIdAndUpdate(id, { shippingStatus, price, currency: currency || 'AED' }, { new: true });
     if (!updatedCar) {
       return res.status(404).json({ message: 'Car not found' });
     }
