@@ -1,4 +1,3 @@
-// src/middlewares/authMiddleware.ts
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/userModel';
@@ -12,14 +11,13 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
       token = req.headers.authorization.split(' ')[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET || '') as { id: string };
 
-      // Fetch user and attach to req.user
       const user = await User.findById(decoded.id).select('-password').exec();
 
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
 
-      req.user = user as IUser; // Type assertion
+      req.user = user as IUser;
       next();
     } catch (error: unknown) {
       if (error instanceof Error) {

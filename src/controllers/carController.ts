@@ -1,20 +1,11 @@
-// src/controllers/carController.ts
 import { Request, Response } from 'express';
 import Car from '../models/carModel';
 import { ICar } from '../interfaces/car';
 
+// Get all cars
 export const getCars = async (req: Request, res: Response) => {
-  const { page = 1, limit = 10, make, model, year, shippingStatus } = req.query;
-  const query: any = {};
-  if (make) query.make = make;
-  if (model) query.model = model;
-  if (year) query.year = year;
-  if (shippingStatus) query.shippingStatus = shippingStatus;
-
   try {
-    const cars: ICar[] = await Car.find(query)
-      .limit(Number(limit))
-      .skip((Number(page) - 1) * Number(limit));
+    const cars: ICar[] = await Car.find();
     res.json(cars);
   } catch (error) {
     console.error('Error fetching cars:', error);
@@ -22,11 +13,12 @@ export const getCars = async (req: Request, res: Response) => {
   }
 };
 
+// Add a new car
 export const addCar = async (req: Request, res: Response) => {
-  const { make, model, year, vin, shippingStatus, price, currency } = req.body;
+  const { make, model, year, price, vin, currency, shippingStatus } = req.body;
 
   try {
-    const newCar: ICar = new Car({ make, model, year, vin, shippingStatus, price, currency: currency || 'AED' }); 
+    const newCar: ICar = new Car({ make, model, year, price, vin, currency, shippingStatus });
     const savedCar: ICar = await newCar.save();
     res.status(201).json(savedCar);
   } catch (error) {
@@ -35,12 +27,30 @@ export const addCar = async (req: Request, res: Response) => {
   }
 };
 
-export const updateCarStatus = async (req: Request, res: Response) => {
+// Update car details (price, model, etc.)
+export const updateCar = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { shippingStatus, price, currency } = req.body;
+  const updates = req.body;
 
   try {
-    const updatedCar: ICar | null = await Car.findByIdAndUpdate(id, { shippingStatus, price, currency: currency || 'AED' }, { new: true });
+    const updatedCar: ICar | null = await Car.findByIdAndUpdate(id, { $set: updates }, { new: true });
+    if (!updatedCar) {
+      return res.status(404).json({ message: 'Car not found' });
+    }
+    res.json(updatedCar);
+  } catch (error) {
+    console.error('Error updating car:', error);
+    res.status(500).json({ message: 'Error updating car' });
+  }
+};
+
+// Update car shipping status
+export const updateCarStatus = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { shippingStatus } = req.body;
+
+  try {
+    const updatedCar: ICar | null = await Car.findByIdAndUpdate(id, { shippingStatus }, { new: true });
     if (!updatedCar) {
       return res.status(404).json({ message: 'Car not found' });
     }
@@ -51,6 +61,7 @@ export const updateCarStatus = async (req: Request, res: Response) => {
   }
 };
 
+// Delete a car
 export const deleteCar = async (req: Request, res: Response) => {
   const { id } = req.params;
 
@@ -59,9 +70,25 @@ export const deleteCar = async (req: Request, res: Response) => {
     if (!deletedCar) {
       return res.status(404).json({ message: 'Car not found' });
     }
-    res.json({ message: 'Car deleted' });
+    res.json({ message: 'Car deleted successfully' });
   } catch (error) {
     console.error('Error deleting car:', error);
     res.status(500).json({ message: 'Error deleting car' });
+  }
+};
+
+// Get a car by ID
+export const getCarById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const car: ICar | null = await Car.findById(id);
+    if (!car) {
+      return res.status(404).json({ message: 'Car not found' });
+    }
+    res.json(car);
+  } catch (error) {
+    console.error('Error fetching car:', error);
+    res.status(500).json({ message: 'Error fetching car' });
   }
 };

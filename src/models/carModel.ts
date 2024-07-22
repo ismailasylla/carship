@@ -11,7 +11,7 @@ const carSchema = new Schema<ICar>({
   currency: { type: String, required: true, default: 'AED' },
   shippingStatus: { 
     type: String, 
-    enum: Object.values(ShippingStatus),  // Use the enum values here
+    enum: Object.values(ShippingStatus),
     default: ShippingStatus.Pending 
   }
 }, { timestamps: true });

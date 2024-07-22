@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getCars, addCar, updateCarStatus, deleteCar } from '../controllers/carController';
+import { getCars, addCar, updateCar, updateCarStatus, deleteCar, getCarById } from '../controllers/carController';
 import { protect } from '../middlewares/authMiddleware';
 
 const router = Router();
@@ -9,7 +9,9 @@ router.route('/')
   .post(protect, addCar);
 
 router.route('/:id')
-  .patch(protect, updateCarStatus)
+  .get(getCarById) 
+  .patch(protect, updateCar)
+  .put(protect, updateCarStatus)
   .delete(protect, deleteCar);
 
 export default router;

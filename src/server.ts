@@ -1,16 +1,16 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import userRoutes from './routes/userRoutes'; // Adjust the path as needed
-import carRoutes from './routes/carRoutes'; // Import car routes
+import userRoutes from './routes/userRoutes';
+import carRoutes from './routes/carRoutes';
 import dotenv from 'dotenv';
 
 const app = express();
 
-dotenv.config(); // Load environment variables
+dotenv.config();
 
-app.use(express.json()); // Middleware to parse JSON bodies
-app.use('/api/auth', userRoutes); // Register user routes
-app.use('/api/cars', carRoutes); // Register car routes
+app.use(express.json());
+app.use('/api/auth', userRoutes);
+app.use('/api/cars', carRoutes);
 
 // MongoDB connection
 const mongoURI = process.env.MONGO_URI;
