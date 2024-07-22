@@ -52,25 +52,35 @@ http://localhost:5001/api
 
 - **URL:** `/api/cars`
 - **Method:** `GET`
-- **Description:** Retrieve a list of all cars.
+- **Description:** Retrieve a list of all cars with pagination and filtering.
+- **Query Parameters:**
+  - `page`: Page number (default: 1)
+  - `limit`: Number of cars per page (default: 10)
+  - `make`: Filter by car make
+  - `model`: Filter by car model
+  - `year`: Filter by car year
+  - `minPrice`: Minimum price
+  - `maxPrice`: Maximum price
+  - `shippingStatus`: Filter by shipping status
 - **Response:**
   ```json
-  [
-    {
-      "_id": "60c72b2f9b1e8b34d8f1b2d2",
-      "make": "Toyota",
-      "model": "Corolla",
-      "year": 2021,
-      "price": 20000
-    },
-    {
-      "_id": "60c72b3f9b1e8b34d8f1b2d3",
-      "make": "Honda",
-      "model": "Civic",
-      "year": 2020,
-      "price": 18000
-    }
-  ]
+  {
+    "totalCars": 50,
+    "page": 1,
+    "totalPages": 5,
+    "cars": [
+      {
+        "_id": "60c72b2f9b1e8b34d8f1b2d2",
+        "make": "Toyota",
+        "model": "Corolla",
+        "year": 2021,
+        "price": 20000,
+        "currency": "AED",
+        "shippingStatus": "Pending"
+      },
+      ...
+    ]
+  }
   ```
 
 #### Get Car by ID
