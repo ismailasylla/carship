@@ -16,7 +16,13 @@ const carSchema = new Schema<ICar>({
   }
 }, { timestamps: true });
 
+// Create indexes for efficient querying
+carSchema.index({ make: 1 });
+carSchema.index({ model: 1 });
+carSchema.index({ year: 1 });
+carSchema.index({ price: 1 });
+carSchema.index({ shippingStatus: 1 });
+
 const Car: Model<ICar> = mongoose.model<ICar>('Car', carSchema);
 
 export default Car;
-

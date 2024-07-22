@@ -4,9 +4,33 @@ import { ICar } from '../interfaces/car';
 
 // Get all cars
 export const getCars = async (req: Request, res: Response) => {
+  const { page = 1, limit = 10, make, model, year, minPrice, maxPrice, shippingStatus } = req.query;
+
+  // Build the filter query object
+  let filter: any = {};
+  if (make) filter.make = make;
+  if (model) filter.model = model;
+  if (year) filter.year = parseInt(year as string);
+  if (minPrice) filter.price = { ...filter.price, $gte: parseFloat(minPrice as string) };
+  if (maxPrice) filter.price = { ...filter.price, $lte: parseFloat(maxPrice as string) };
+  if (shippingStatus) filter.shippingStatus = shippingStatus;
+
   try {
-    const cars: ICar[] = await Car.find();
-    res.json(cars);
+    // Fetch cars with pagination and filtering
+    const cars = await Car.find(filter)
+      .skip((parseInt(page as string) - 1) * parseInt(limit as string))
+      .limit(parseInt(limit as string))
+      .exec();
+
+    // Count total cars for pagination info
+    const totalCars = await Car.countDocuments(filter);
+
+    res.json({
+      totalCars,
+      page: parseInt(page as string),
+      totalPages: Math.ceil(totalCars / parseInt(limit as string)),
+      cars,
+    });
   } catch (error) {
     console.error('Error fetching cars:', error);
     res.status(500).json({ message: 'Error fetching cars' });
