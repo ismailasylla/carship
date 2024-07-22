@@ -13,7 +13,7 @@ app.use('/api/auth', userRoutes);
 app.use('/api/cars', carRoutes);
 
 // MongoDB connection
-const mongoURI = process.env.MONGO_URI;
+const mongoURI = process.env.MONGO_URI || '';
 if (!mongoURI) {
   console.error('MONGO_URI is not defined in the environment variables');
   process.exit(1);
