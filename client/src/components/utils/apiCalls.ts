@@ -36,6 +36,6 @@ export const updateCarRequest = async (car: Car) => {
   return response.data;
 };
 
-export const deleteCarRequest = async (id: string) => {
-  await api.delete(`/api/cars/${id}`);
+export const deleteCarRequest = async (_id: string) => {
+  await api.delete(`/api/cars/${_id}`);
 };
