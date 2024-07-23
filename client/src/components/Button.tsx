@@ -21,7 +21,7 @@ const Button: React.FC<ButtonProps> = ({
       <Link to={to} className={`w-full ${className}`}>
         <button
           type={type}
-          className={`bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300 ${className}`}
+          className={`bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors duration-300 ${className}`}
         >
           {children}
         </button>
@@ -33,7 +33,7 @@ const Button: React.FC<ButtonProps> = ({
     <button
       type={type}
       onClick={onClick}
-      className={`bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300 ${className}`}
+      className={`bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors duration-300 ${className}`}
     >
       {children}
     </button>

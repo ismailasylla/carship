@@ -169,7 +169,7 @@ const CarDetailPage: React.FC = () => {
             <div className="flex justify-between">
               <button
                 type="submit"
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300"
+                className="bg-gray-800 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors duration-300"
               >
                 Update Car
               </button>
