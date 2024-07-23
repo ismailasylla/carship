@@ -1,9 +1,7 @@
-// src/components/CarListPage.tsx
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../store";
 import { fetchCars } from "../store/slices/carSlice";
-// import { Link } from "react-router-dom";
 import placeholderImg from "../assets/placeholder.jpg";
 import { Button } from "./index";
 
@@ -48,6 +46,9 @@ const CarListPage: React.FC = () => {
                 </p>
                 <p className="mb-2">
                   <strong>Currency:</strong> {car.currency}
+                </p>
+                <p className="mb-2">
+                  <strong>Price:</strong> {car.price} {car.currency}
                 </p>
                 <p className="mb-2">
                   <strong>Shipping Status:</strong> {car.shippingStatus}

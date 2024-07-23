@@ -18,11 +18,14 @@ const CarDetailPage: React.FC = () => {
 
   useEffect(() => {
     if (id) {
-      dispatch(getCar(id));
+      dispatch(getCar(id)).then(() => {
+        console.log("Car fetched:", car);
+      });
     }
   }, [id, dispatch]);
 
   useEffect(() => {
+    console.log("Setting form:", car);
     setForm(car);
   }, [car]);
 
@@ -137,7 +140,7 @@ const CarDetailPage: React.FC = () => {
                 type="number"
                 id="price"
                 name="price"
-                value={form.price}
+                value={form?.price || ""}
                 onChange={handleChange}
                 className="w-full p-2 border border-gray-300 rounded"
                 required
