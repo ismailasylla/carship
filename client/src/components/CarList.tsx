@@ -1,9 +1,11 @@
+// src/components/CarListPage.tsx
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../store";
 import { fetchCars } from "../store/slices/carSlice";
-import { Link } from "react-router-dom";
-import placeholderImg from "../assets/placeholder.jpg"; // Import the image
+// import { Link } from "react-router-dom";
+import placeholderImg from "../assets/placeholder.jpg";
+import { Button } from "./index";
 
 const CarListPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -51,11 +53,9 @@ const CarListPage: React.FC = () => {
                   <strong>Shipping Status:</strong> {car.shippingStatus}
                 </p>
                 {isAuthenticated && (
-                  <Link to={`/car/${car._id}`}>
-                    <button className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300">
-                      Edit Car
-                    </button>
-                  </Link>
+                  <Button to={`/car/${car._id}`} className="w-full mt-4">
+                    Edit Car
+                  </Button>
                 )}
               </div>
             ))}

@@ -1,13 +1,7 @@
-// src/App.tsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import CarDetailPage from "./pages/CarDetailPage";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import CarForm from "./components/CarForm";
-import NavBar from "./components/NavBar";
-import HomePage from "./pages/HomePage";
-import AuthRoute from "./components/AuthRoute";
+import { AuthRoute, CarForm, NavBar } from "./components";
+import { CarDetailPage, HomePage, LoginPage, RegisterPage } from "./pages";
 
 const App: React.FC = () => {
   return (
