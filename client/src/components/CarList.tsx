@@ -22,7 +22,7 @@ const CarList: React.FC<CarListProps> = ({ cars }) => {
             <p className="text-gray-700 mb-1">
               Price:{car.price} {car.currency}
             </p>
-            <p className="text-gray-700 mb-1">Status: {car.status}</p>
+            <p className="text-gray-700 mb-1">Status: {car.shippingStatus}</p>
           </div>
         ))
       ) : (

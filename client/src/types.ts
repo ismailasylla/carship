@@ -9,5 +9,5 @@ export interface Car {
     currency: string;
     price: number;
     year: number;
-    status: string;
+    shippingStatus: string;
   }
