@@ -14,7 +14,7 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     dispatch(fetchCars()).then((action) => {
       if (fetchCars.fulfilled.match(action)) {
-        console.log("Fetched cars:", action.payload); // Ensure correct data
+        console.log("Fetched cars:", action.payload);
       } else {
         console.error("Failed to fetch cars");
       }

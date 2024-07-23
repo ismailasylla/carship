@@ -41,7 +41,7 @@ const CarDetailPage: React.FC = () => {
     }
     if (form) {
       dispatch(updateCar(form));
-      navigate("/"); // Redirect to the home page or list page after updating
+      navigate("/");
     }
   };
 
@@ -52,7 +52,7 @@ const CarDetailPage: React.FC = () => {
     }
     if (id) {
       dispatch(deleteCar(id));
-      navigate("/"); // Redirect to the home page or list page after deleting
+      navigate("/");
     }
   };
 

@@ -7,7 +7,6 @@ import carRoutes from './routes/carRoutes';
 import userRoutes from './routes/userRoutes';
 import config from './config/service';
 
-// Initialize Express app
 const app = express();
 
 // Middleware
@@ -53,7 +52,7 @@ export const emitCarUpdate = (updatedCars: any) => {
 };
 
 // Start server with default value if PORT is undefined
-const port = config.PORT || '3000'; // Default to port 3000 if not defined
+const port = config.PORT || '3000'; 
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
