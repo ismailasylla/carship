@@ -54,22 +54,21 @@ const carSlice = createSlice({
       .addCase(fetchCars.fulfilled, (state, action: PayloadAction<Car[]>) => {
         state.status = 'succeeded';
         state.cars = action.payload;
-        console.log('Cars fetched and state updated:', action.payload);
       })
       .addCase(fetchCars.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload as string || 'Failed to fetch cars';
+        state.error = action.payload || 'Failed to fetch cars';
       })
       .addCase(addCar.pending, (state) => {
         state.status = 'loading';
       })
       .addCase(addCar.fulfilled, (state, action: PayloadAction<Car>) => {
         state.status = 'succeeded';
-        state.cars.push(action.payload); 
+        state.cars.push(action.payload);
       })
       .addCase(addCar.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload as string || 'Failed to add car';
+        state.error = action.payload || 'Failed to add car';
       });
   },
 });

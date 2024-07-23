@@ -1,25 +1,22 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Provider } from "react-redux";
-import store from "./store";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import HomePage from "./components/pages/HomePage";
-import LoginPage from "./components/pages/LoginPage";
-import RegisterPage from "./components/pages/RegisterPage";
+import Login from "./components/pages/LoginPage";
+import Register from "./components/pages/RegisterPage";
+import CarForm from "./components/CarForm";
 import NavBar from "./components/NavBar";
-import "./index.css";
 
 const App: React.FC = () => {
   return (
-    <Provider store={store}>
-      <Router>
-        <NavBar />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-        </Routes>
-      </Router>
-    </Provider>
+    <Router>
+      <NavBar />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/add-car" element={<CarForm />} />
+      </Routes>
+    </Router>
   );
 };
 
