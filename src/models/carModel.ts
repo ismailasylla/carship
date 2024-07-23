@@ -5,8 +5,8 @@ import { ShippingStatus } from '../interfaces/enums/shippingStatus.enum';
 const carSchema = new Schema<ICar>({
   make: { type: String, required: true },
   model: { type: String, required: true },
-  year: { type: Number, required: true },
-  price: { type: Number, required: true },
+  year: { type: Number, required: true, min: 1900, max: new Date().getFullYear() },
+  price: { type: Number, required: true, min: 0 },
   vin: { type: String, required: true, unique: true },
   currency: { type: String, required: true, default: 'AED' },
   shippingStatus: { 

@@ -53,11 +53,11 @@ export const addCar = async (req: Request, res: Response) => {
 
 // Update car details (price, model, etc.)
 export const updateCar = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const { _id } = req.params;
   const updates = req.body;
 
   try {
-    const updatedCar: ICar | null = await Car.findByIdAndUpdate(id, { $set: updates }, { new: true });
+    const updatedCar: ICar | null = await Car.findByIdAndUpdate(_id, { $set: updates }, { new: true });
     if (!updatedCar) {
       return res.status(404).json({ message: 'Car not found' });
     }
@@ -70,11 +70,11 @@ export const updateCar = async (req: Request, res: Response) => {
 
 // Update car shipping status
 export const updateCarStatus = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const { _id } = req.params;
   const { shippingStatus } = req.body;
 
   try {
-    const updatedCar: ICar | null = await Car.findByIdAndUpdate(id, { shippingStatus }, { new: true });
+    const updatedCar: ICar | null = await Car.findByIdAndUpdate(_id, { shippingStatus }, { new: true });
     if (!updatedCar) {
       return res.status(404).json({ message: 'Car not found' });
     }
@@ -87,10 +87,10 @@ export const updateCarStatus = async (req: Request, res: Response) => {
 
 // Delete a car
 export const deleteCar = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const { _id } = req.params;
 
   try {
-    const deletedCar: ICar | null = await Car.findByIdAndDelete(id);
+    const deletedCar: ICar | null = await Car.findByIdAndDelete(_id);
     if (!deletedCar) {
       return res.status(404).json({ message: 'Car not found' });
     }
@@ -103,10 +103,10 @@ export const deleteCar = async (req: Request, res: Response) => {
 
 // Get a car by ID
 export const getCarById = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const { _id } = req.params;
 
   try {
-    const car: ICar | null = await Car.findById(id);
+    const car: ICar | null = await Car.findById(_id);
     if (!car) {
       return res.status(404).json({ message: 'Car not found' });
     }
