@@ -30,3 +30,12 @@ export const addCarRequest = async (car: Car) => {
   const response = await api.post('/api/cars', car);
   return response.data;
 };
+
+export const updateCarRequest = async (car: Car) => {
+  const response = await api.put(`/api/cars/${car._id}`, car);
+  return response.data;
+};
+
+export const deleteCarRequest = async (id: string) => {
+  await api.delete(`/api/cars/${id}`);
+};

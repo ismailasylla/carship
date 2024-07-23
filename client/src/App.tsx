@@ -1,10 +1,12 @@
-import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import HomePage from "./components/pages/HomePage";
-import Login from "./components/pages/LoginPage";
-import Register from "./components/pages/RegisterPage";
+// import CarList from "./components/CarList";
+import CarDetailPage from "./components/CarDetailPage";
+import LoginPage from "./components/pages/LoginPage";
+import RegisterPage from "./components/pages/RegisterPage";
 import CarForm from "./components/CarForm";
 import NavBar from "./components/NavBar";
+import HomePage from "./components/pages/HomePage";
+import CarListPage from "./components/CarList";
 
 const App: React.FC = () => {
   return (
@@ -12,9 +14,12 @@ const App: React.FC = () => {
       <NavBar />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/car/:id" element={<CarDetailPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route path="/add-car" element={<CarForm />} />
+        {/* <Route path="/" element={<CarListPage />} /> */}
+        <Route path="/car/:id" element={<CarDetailPage />} />
       </Routes>
     </Router>
   );

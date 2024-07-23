@@ -1,11 +1,13 @@
 export interface Car {
-  id: string;
-  model: string;
+  _id: string;
   make: string;
-  name: string;
-  brand: string;
+  model: string;
+  year: number;
   currency: string;
   price: number;
-  year: number;
   shippingStatus: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+  vin: string;
 }

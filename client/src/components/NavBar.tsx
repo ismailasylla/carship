@@ -11,6 +11,11 @@ const NavBar: React.FC = () => {
           </Link>
         </li>
         <li>
+          <Link to="/add-car" className="text-white hover:text-gray-200">
+            Add Car
+          </Link>
+        </li>
+        <li>
           <Link to="/login" className="text-white hover:text-gray-200">
             Login
           </Link>
@@ -18,11 +23,6 @@ const NavBar: React.FC = () => {
         <li>
           <Link to="/register" className="text-white hover:text-gray-200">
             Register
-          </Link>
-        </li>
-        <li>
-          <Link to="/add-car" className="text-white hover:text-gray-200">
-            Add Car
           </Link>
         </li>
       </ul>

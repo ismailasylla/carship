@@ -36,7 +36,6 @@ const HomePage: React.FC = () => {
 
   return (
     <div>
-      <h1>Car Listings</h1>
       {status === "loading" && <p>Loading...</p>}
       {status === "failed" && <p>{error}</p>}
       <CarList cars={cars} />
