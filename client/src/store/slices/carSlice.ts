@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { fetchCars as fetchCarsAPI, addCarRequest as addCarAPI, updateCarRequest as updateCarAPI, deleteCarRequest as deleteCarAPI } from '../../components/utils/apiCalls';
+import { fetchCars as fetchCarsAPI, addCarRequest as addCarAPI, updateCarRequest as updateCarAPI, deleteCarRequest as deleteCarAPI } from '../../utils/apiCalls';
 import { Car } from '../../types';
 import { RootState } from '../../store';
 
@@ -87,7 +87,7 @@ export const getCar = createAsyncThunk<Car, string, { rejectValue: string }>(
   async (id, thunkAPI) => {
     try {
       const cars = await fetchCarsAPI();
-      const car = cars.find((car) => car._id === id);
+      const car = cars.find((car: { _id: string; }) => car._id === id);
       if (!car) throw new Error('Car not found');
       return car;
     } catch (error) {

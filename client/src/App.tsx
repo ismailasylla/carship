@@ -1,12 +1,13 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-// import CarList from "./components/CarList";
-import CarDetailPage from "./components/CarDetailPage";
-import LoginPage from "./components/pages/LoginPage";
-import RegisterPage from "./components/pages/RegisterPage";
+// src/App.tsx
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import CarDetailPage from "./pages/CarDetailPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import CarForm from "./components/CarForm";
 import NavBar from "./components/NavBar";
-import HomePage from "./components/pages/HomePage";
-import CarListPage from "./components/CarList";
+import HomePage from "./pages/HomePage";
+import AuthRoute from "./components/AuthRoute";
 
 const App: React.FC = () => {
   return (
@@ -17,9 +18,8 @@ const App: React.FC = () => {
         <Route path="/car/:id" element={<CarDetailPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/add-car" element={<CarForm />} />
-        {/* <Route path="/" element={<CarListPage />} /> */}
-        <Route path="/car/:id" element={<CarDetailPage />} />
+        {/* Protecting the /add-car route */}
+        <Route path="/add-car" element={<AuthRoute element={<CarForm />} />} />
       </Routes>
     </Router>
   );

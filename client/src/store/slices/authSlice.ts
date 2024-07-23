@@ -15,7 +15,7 @@ const initialState: AuthState = {
   error: null,
 };
 
-
+// Async thunks
 export const loginUser = createAsyncThunk<
   any, 
   { email: string; password: string }, 
@@ -35,7 +35,7 @@ export const loginUser = createAsyncThunk<
 export const registerUser = createAsyncThunk<
   any, 
   { email: string; password: string }, 
-  { rejectValue: string } 
+  { rejectValue: string }
 >(
   'auth/registerUser',
   async ({ email, password }, thunkAPI) => {
