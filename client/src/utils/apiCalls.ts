@@ -4,8 +4,9 @@ import api from './api';
 const cache = new Map<string, any>();
 const CACHE_DURATION = 300000; // 5 minutes
 
-export const fetchCars = async (): Promise<Car[]> => {
-  const cacheKey = 'cars';
+// Fetch cars with pagination
+export const fetchCars = async (page: number): Promise<{ cars: Car[], totalPages: number }> => {
+  const cacheKey = `cars_page_${page}`;
 
   // Check the cache
   if (cache.has(cacheKey) && Date.now() - cache.get(cacheKey).timestamp < CACHE_DURATION) {
@@ -14,16 +15,17 @@ export const fetchCars = async (): Promise<Car[]> => {
   }
 
   // Fetch data from the API
-  const response = await api.get('/api/cars');
+  const response = await api.get(`/api/cars?page=${page}`);
   console.log('Fetched data from API:', response.data);
 
-  // Check if the response is an array or an object containing an array
-  const carsData = Array.isArray(response.data) ? response.data : response.data.cars;
+  // Extract cars and totalPages from response
+  const carsData = response.data.cars;
+  const totalPages = response.data.totalPages;
 
   // Update the cache
-  cache.set(cacheKey, { timestamp: Date.now(), data: carsData });
+  cache.set(cacheKey, { timestamp: Date.now(), data: { cars: carsData, totalPages } });
 
-  return carsData;
+  return { cars: carsData, totalPages };
 };
 
 export const addCarRequest = async (car: Car) => {

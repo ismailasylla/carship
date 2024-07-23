@@ -8,6 +8,8 @@ export interface CarState {
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
   currentCar: Car | null;
+  totalPages: number;
+  currentPage: number;
 }
 
 const initialState: CarState = {
@@ -15,15 +17,17 @@ const initialState: CarState = {
   status: 'idle',
   error: null,
   currentCar: null,
+  totalPages: 1,
+  currentPage: 1,
 };
 
-// Fetch cars
-export const fetchCars = createAsyncThunk<Car[], void, { rejectValue: string }>(
+// Fetch cars with pagination
+export const fetchCars = createAsyncThunk<{ cars: Car[], totalPages: number }, { page: number }, { rejectValue: string }>(
   'car/fetchCars',
-  async (_, thunkAPI) => {
+  async ({ page }, thunkAPI) => {
     try {
-      const cars = await fetchCarsAPI();
-      return cars;
+      const { cars, totalPages } = await fetchCarsAPI(page);
+      return { cars, totalPages };
     } catch (error) {
       return thunkAPI.rejectWithValue('Failed to fetch cars');
     }
@@ -86,8 +90,8 @@ export const getCar = createAsyncThunk<Car, string, { rejectValue: string }>(
   'car/getCar',
   async (id, thunkAPI) => {
     try {
-      const cars = await fetchCarsAPI();
-      const car = cars.find((car: { _id: string; }) => car._id === id);
+      const cars = await fetchCarsAPI(1); // Fetch with default page 1
+      const car = cars.cars.find((car: { _id: string; }) => car._id === id);
       if (!car) throw new Error('Car not found');
       return car;
     } catch (error) {
@@ -103,15 +107,19 @@ const carSlice = createSlice({
     updateCars(state, action: PayloadAction<Car[]>) {
       state.cars = action.payload;
     },
+    setPage(state, action: PayloadAction<number>) {
+      state.currentPage = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchCars.pending, (state) => {
         state.status = 'loading';
       })
-      .addCase(fetchCars.fulfilled, (state, action: PayloadAction<Car[]>) => {
+      .addCase(fetchCars.fulfilled, (state, action: PayloadAction<{ cars: Car[], totalPages: number }>) => {
         state.status = 'succeeded';
-        state.cars = action.payload;
+        state.cars = action.payload.cars;
+        state.totalPages = action.payload.totalPages;
       })
       .addCase(fetchCars.rejected, (state, action) => {
         state.status = 'failed';
@@ -166,6 +174,6 @@ const carSlice = createSlice({
   },
 });
 
-export const { updateCars } = carSlice.actions;
+export const { updateCars, setPage } = carSlice.actions;
 
 export default carSlice.reducer;
