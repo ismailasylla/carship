@@ -1,6 +1,8 @@
 import React, { Suspense, lazy } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import NavBar from "./components/NavBar";
+import AuthRoute from "./components/AuthRoute";
+
 const HomePage = lazy(() => import("./pages/HomePage"));
 const CarDetailPage = lazy(() => import("./pages/CarDetailPage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
@@ -17,7 +19,10 @@ const App: React.FC = () => {
           <Route path="/car/:id" element={<CarDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/add-car" element={<CarForm />} />
+          <Route
+            path="/add-car"
+            element={<AuthRoute element={<CarForm />} />}
+          />
         </Routes>
       </Suspense>
     </Router>
