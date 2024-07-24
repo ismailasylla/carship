@@ -23,13 +23,13 @@ const NavBar: React.FC = () => {
               Home
             </Link>
           </li>
-          {isAuthenticated && (
+          {/* {isAuthenticated && (
             <li>
               <Link to="/add-car" className="text-white hover:text-gray-200">
                 Add Car
               </Link>
             </li>
-          )}
+          )} */}
         </ul>
         <div className="flex space-x-4">
           {!isAuthenticated ? (
