@@ -4,85 +4,56 @@ import { RootState, AppDispatch } from "../store";
 import { fetchCars, setPage } from "../store/slices/carSlice";
 import placeholderImg from "../assets/placeholder.jpg";
 import { Button } from "./index";
-import Pagination from "./Pagination"; // Import the Pagination component
+import Pagination from "./Pagination";
+import CarFilter from "./CarFilter";
 
 const CarListPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { cars, status, error, currentPage, totalPages } = useSelector(
+  const { cars, status, error, currentPage, totalPages, filters } = useSelector(
     (state: RootState) => state.car
   );
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    dispatch(fetchCars({ page: currentPage }));
-  }, [dispatch, currentPage]);
+    dispatch(fetchCars({ page: currentPage, ...filters }));
+  }, [dispatch, currentPage, filters]);
 
   const handlePageChange = (page: number) => {
     dispatch(setPage(page));
-    dispatch(fetchCars({ page }));
+    dispatch(fetchCars({ page, ...filters }));
   };
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <div className="container mx-auto">
-        <h1 className="text-4xl font-bold mb-8 text-center text-gray-800">
+        <h1 className="text-4xl font-bold mb-6 text-center text-gray-800">
           Car List
         </h1>
+        <CarFilter />
         {status === "loading" && <p>Loading...</p>}
         {status === "failed" && <p>Error: {error}</p>}
-        {status === "succeeded" && (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array.isArray(cars) && cars.length > 0 ? (
-                cars.map((car) => (
-                  <div
-                    key={car._id}
-                    className="bg-white p-4 shadow-lg rounded-lg"
-                  >
-                    <div className="w-full h-48 mb-4 overflow-hidden rounded-lg">
-                      <img
-                        src={placeholderImg}
-                        alt={`${car.make} ${car.model}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <h2 className="text-2xl font-semibold mb-2">
-                      {car.make} {car.model}
-                    </h2>
-                    <p className="mb-2">
-                      <strong>Year:</strong> {car.year}
-                    </p>
-                    <p className="mb-2">
-                      <strong>VIN:</strong> {car.vin}
-                    </p>
-                    <p className="mb-2">
-                      <strong>Currency:</strong> {car.currency}
-                    </p>
-                    <p className="mb-2">
-                      <strong>Price:</strong> {car.price} {car.currency}
-                    </p>
-                    <p className="mb-2">
-                      <strong>Shipping Status:</strong> {car.shippingStatus}
-                    </p>
-                    {isAuthenticated && (
-                      <Button to={`/car/${car._id}`} className="w-full mt-4">
-                        Edit Car
-                      </Button>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <p>No cars available</p>
-              )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {cars.map((car) => (
+            <div key={car._id} className="bg-white p-4 shadow-md rounded-lg">
+              <img
+                src={car.imageUrl || placeholderImg}
+                alt={car.model}
+                className="w-full h-48 object-cover mb-4 rounded-lg"
+              />
+              <h2 className="text-xl font-semibold mb-2">
+                {car.make} {car.model}
+              </h2>
+              <p className="text-sm mb-2">Year: {car.year}</p>
+              <p className="text-sm mb-2">Price: ${car.price}</p>
+              {isAuthenticated && <Button className="mt-4 w-full">Edit</Button>}
             </div>
-
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
-          </>
-        )}
+          ))}
+        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 export interface Car {
+  imageUrl: string;
   _id: string;
   make: string;
   model: string;
