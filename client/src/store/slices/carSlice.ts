@@ -4,13 +4,15 @@ import {
   addCarRequest as addCarAPI,
   updateCarRequest as updateCarAPI,
   deleteCarRequest as deleteCarAPI,
-  fetchFilterOptions as fetchFilterOptionsAPI
+  fetchFilterOptions as fetchFilterOptionsAPI,
+  fetchCarRequest as fetchCarAPI // Import the fetchCarRequest function
 } from '../../utils/apiCalls';
 import { Car } from '../../types';
 import { RootState } from '../../store';
 
 interface CarState {
   cars: Car[];
+  currentCar: Car | null; // Add this to store the current car details
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
   currentPage: number;
@@ -29,6 +31,7 @@ interface CarState {
 
 const initialState: CarState = {
   cars: [],
+  currentCar: null, // Initialize to null
   status: 'idle',
   error: null,
   currentPage: 1,
@@ -47,6 +50,9 @@ const initialState: CarState = {
 
 interface FetchCarsParams {
   page: number;
+  model: string;
+  year: string;
+  make: string;
 }
 
 interface FetchCarsResponse {
@@ -136,6 +142,19 @@ export const deleteCar = createAsyncThunk<string, string, { rejectValue: string 
   }
 );
 
+// New thunk to fetch a single car
+export const getCar = createAsyncThunk<Car, string, { rejectValue: string }>(
+  'car/getCar',
+  async (id, thunkAPI) => {
+    try {
+      const car = await fetchCarAPI(id);
+      return car;
+    } catch (error) {
+      return thunkAPI.rejectWithValue('Failed to fetch car');
+    }
+  }
+);
+
 const carSlice = createSlice({
   name: 'car',
   initialState,
@@ -166,6 +185,17 @@ const carSlice = createSlice({
       })
       .addCase(fetchFilterOptions.fulfilled, (state, action: PayloadAction<{ models: string[], makes: string[], years: string[] }>) => {
         state.filterOptions = action.payload;
+      })
+      .addCase(getCar.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(getCar.fulfilled, (state, action: PayloadAction<Car>) => {
+        state.status = 'succeeded';
+        state.currentCar = action.payload; // Set the current car
+      })
+      .addCase(getCar.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload || 'Failed to fetch car';
       });
   },
 });

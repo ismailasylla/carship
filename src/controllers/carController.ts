@@ -7,7 +7,6 @@ import { ShippingStatus } from '../interfaces/enums/shippingStatus.enum';
 export const getCars = async (req: Request, res: Response) => {
   const { page = 1, limit = 10, make, model, year, minPrice, maxPrice, shippingStatus } = req.query;
 
-  // Build the filter query object
   let filter: any = {};
   if (make) filter.make = make;
   if (model) filter.model = model;
@@ -26,12 +25,15 @@ export const getCars = async (req: Request, res: Response) => {
 
     res.status(200).json({ cars, totalPages });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    console.error('Error fetching cars:', error);
+    res.status(500).json({ message: 'Server error', error: (error as Error).message });
   }
 };
 
 // Get filter options for cars (make, model, year)
 export const getFilterOptions = async (req: Request, res: Response) => {
+  console.log('Request query:', req.query); // Log query parameters
+
   try {
     const makes = await Car.distinct('make');
     const models = await Car.distinct('model');
@@ -39,7 +41,8 @@ export const getFilterOptions = async (req: Request, res: Response) => {
 
     res.status(200).json({ makes, models, years });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    console.error('Error fetching filter options:', error);
+    res.status(500).json({ message: 'Server error', error: (error as Error).message });
   }
 };
 
@@ -61,7 +64,8 @@ export const createCar = async (req: Request, res: Response) => {
     await car.save();
     res.status(201).json(car);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    console.error('Error creating car:', error);
+    res.status(500).json({ message: 'Server error', error: (error as Error).message });
   }
 };
 
@@ -86,7 +90,8 @@ export const updateCar = async (req: Request, res: Response) => {
 
     res.status(200).json(updatedCar);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    console.error('Error updating car:', error);
+    res.status(500).json({ message: 'Server error', error: (error as Error).message });
   }
 };
 
@@ -104,6 +109,25 @@ export const deleteCar = async (req: Request, res: Response) => {
     await Car.deleteOne({ _id: id });
     res.status(200).json({ message: 'Car deleted' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    console.error('Error deleting car:', error);
+    res.status(500).json({ message: 'Server error', error: (error as Error).message });
+  }
+};
+
+// Fetch a single car by ID
+export const getCarById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const car = await Car.findById(id);
+
+    if (!car) {
+      return res.status(404).json({ message: 'Car not found' });
+    }
+
+    res.status(200).json(car);
+  } catch (error) {
+    console.error('Error fetching car:', error);
+    res.status(500).json({ message: 'Server error', error: (error as Error).message });
   }
 };

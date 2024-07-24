@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for routing
 import { RootState, AppDispatch } from "../store";
 import { fetchCars, setPage } from "../store/slices/carSlice";
 import placeholderImg from "../assets/placeholder.jpg";
@@ -9,6 +10,7 @@ import CarFilter from "./CarFilter";
 
 const CarListPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
+  const navigate = useNavigate(); // Initialize navigate hook
   const { cars, status, error, currentPage, totalPages, filters } = useSelector(
     (state: RootState) => state.car
   );
@@ -21,6 +23,11 @@ const CarListPage: React.FC = () => {
   const handlePageChange = (page: number) => {
     dispatch(setPage(page));
     dispatch(fetchCars({ page, ...filters }));
+  };
+
+  const handleEdit = (carId: string) => {
+    console.log(`Edit button clicked for carId: ${carId}`);
+    navigate(`/car/${carId}`); // Redirect to car details page
   };
 
   return (
@@ -77,7 +84,14 @@ const CarListPage: React.FC = () => {
                   <span className="text-gray-600">{car.shippingStatus}</span>
                 </div>
               </div>
-              {isAuthenticated && <Button className="mt-4 w-full">Edit</Button>}
+              {isAuthenticated && (
+                <Button
+                  className="mt-4 w-full"
+                  onClick={() => handleEdit(car._id)} // Pass car._id to handleEdit
+                >
+                  Edit
+                </Button>
+              )}
             </div>
           ))}
         </div>

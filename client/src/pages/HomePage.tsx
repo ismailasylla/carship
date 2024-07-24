@@ -12,7 +12,13 @@ const HomePage: React.FC = () => {
   const error = useSelector((state: RootState) => state.car.error);
 
   useEffect(() => {
-    dispatch(fetchCars()).then((action) => {
+    // Example parameters, replace with actual values or logic as needed
+    const page = 1;
+    const model = "";
+    const year = "";
+    const make = "";
+
+    dispatch(fetchCars({ page, model, year, make })).then((action) => {
       if (fetchCars.fulfilled.match(action)) {
         console.log("Fetched cars:", action.payload);
       } else {

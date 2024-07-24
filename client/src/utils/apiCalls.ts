@@ -73,10 +73,21 @@ export const deleteCarRequest = async (_id: string) => {
 // Fetch filter options (models, makes, years)
 export const fetchFilterOptions = async () => {
   try {
-    const response = await api.get('/api/cars/filters');
+    const response = await axios.get('/api/cars/filters');
     return response.data;
   } catch (error) {
     console.error('Error fetching filter options:', error);
+    throw error;
+  }
+};
+
+// Fetch a single car by ID
+export const fetchCarRequest = async (id: string): Promise<Car> => {
+  try {
+    const response = await api.get(`/api/cars/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching car:', error);
     throw error;
   }
 };

@@ -1,5 +1,5 @@
 import express from 'express';
-import { getCars, createCar, updateCar, deleteCar, getFilterOptions } from '../controllers/carController';
+import { getCars, createCar, updateCar, deleteCar, getFilterOptions, getCarById } from '../controllers/carController';
 
 const router = express.Router();
 
@@ -8,6 +8,7 @@ router.route('/')
   .post(createCar);
 
 router.route('/:id')
+  .get(getCarById)    // New route to get a single car by ID
   .put(updateCar)
   .delete(deleteCar);
 

@@ -36,14 +36,14 @@ const CarDetailPage: React.FC = () => {
     setForm((prevForm) => (prevForm ? { ...prevForm, [name]: value } : null));
   };
 
-  const handleUpdate = (e: React.FormEvent) => {
+  const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
       alert("You must be logged in to update a car.");
       return;
     }
     if (form) {
-      dispatch(updateCar(form));
+      await dispatch(updateCar(form)).unwrap();
       navigate("/");
     }
   };
