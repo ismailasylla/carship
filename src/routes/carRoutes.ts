@@ -1,17 +1,17 @@
-import { Router } from 'express';
-import { getCars, addCar, updateCar, updateCarStatus, deleteCar, getCarById } from '../controllers/carController';
-import { protect } from '../middlewares/authMiddleware';
+import express from 'express';
+import { getCars, createCar, updateCar, deleteCar, getFilterOptions } from '../controllers/carController';
 
-const router = Router();
+const router = express.Router();
 
 router.route('/')
   .get(getCars)
-  .post(protect, addCar);
+  .post(createCar);
 
 router.route('/:id')
-  .get(getCarById) 
-  .patch(protect, updateCar)
-  .put(protect, updateCarStatus)
-  .delete(protect, deleteCar);
+  .put(updateCar)
+  .delete(deleteCar);
+
+router.route('/filters')
+  .get(getFilterOptions);
 
 export default router;

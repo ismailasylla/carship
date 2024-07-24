@@ -10,3 +10,4 @@ export interface ICar extends Document {
   vin: string;
   shippingStatus: ShippingStatus;
 }
+

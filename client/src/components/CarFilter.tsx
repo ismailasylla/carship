@@ -1,17 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../store";
-import { setFilters, fetchCars } from "../store/slices/carSlice";
+import {
+  setFilters,
+  fetchCars,
+  fetchFilterOptions,
+} from "../store/slices/carSlice";
 
 const CarFilter: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { filters } = useSelector((state: RootState) => state.car);
+  const { filters, filterOptions, status } = useSelector(
+    (state: RootState) => state.car
+  );
+
+  useEffect(() => {
+    dispatch(fetchFilterOptions());
+  }, [dispatch]);
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     dispatch(setFilters({ [e.target.name]: e.target.value }));
-  };
-
-  const applyFilters = () => {
     dispatch(fetchCars({ page: 1 }));
   };
 
@@ -31,11 +38,14 @@ const CarFilter: React.FC = () => {
             name="model"
             value={filters.model}
             onChange={handleFilterChange}
-            onBlur={applyFilters}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
           >
             <option value="">All Models</option>
-            {/* Add model options here */}
+            {filterOptions.models.map((model) => (
+              <option key={model} value={model}>
+                {model}
+              </option>
+            ))}
           </select>
         </div>
         <div>
@@ -50,11 +60,14 @@ const CarFilter: React.FC = () => {
             name="year"
             value={filters.year}
             onChange={handleFilterChange}
-            onBlur={applyFilters}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
           >
             <option value="">All Years</option>
-            {/* Add year options here */}
+            {filterOptions.years.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
           </select>
         </div>
         <div>
@@ -69,14 +82,19 @@ const CarFilter: React.FC = () => {
             name="make"
             value={filters.make}
             onChange={handleFilterChange}
-            onBlur={applyFilters}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
           >
             <option value="">All Makes</option>
-            {/* Add make options here */}
+            {filterOptions.makes.map((make) => (
+              <option key={make} value={make}>
+                {make}
+              </option>
+            ))}
           </select>
         </div>
       </div>
+      {status === "loading" && <p>Loading filter options...</p>}
+      {status === "failed" && <p>Error loading filter options</p>}
     </div>
   );
 };

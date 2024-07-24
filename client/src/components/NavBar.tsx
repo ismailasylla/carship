@@ -7,7 +7,9 @@ const NavBar: React.FC = () => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   return (
-    <nav className="bg-customGray p-4">
+    <nav className="bg-customGray p-4 fixed top-0 left-0 w-full z-50 shadow-md mb-4">
+      {" "}
+      {/* Added mb-4 */}
       <div className="container mx-auto flex justify-between items-center">
         <ul className="flex space-x-4">
           <li>

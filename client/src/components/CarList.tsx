@@ -24,27 +24,59 @@ const CarListPage: React.FC = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
+    <div className="pt-16 p-6 bg-gray-100 min-h-screen">
       <div className="container mx-auto">
-        <h1 className="text-4xl font-bold mb-6 text-center text-gray-800">
-          Car List
-        </h1>
         <CarFilter />
-        {status === "loading" && <p>Loading...</p>}
-        {status === "failed" && <p>Error: {error}</p>}
+        {status === "loading" && (
+          <p className="text-center text-gray-600">Loading...</p>
+        )}
+        {status === "failed" && (
+          <p className="text-center text-red-600">Error: {error}</p>
+        )}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {cars.map((car) => (
-            <div key={car._id} className="bg-white p-4 shadow-md rounded-lg">
-              <img
-                src={car.imageUrl || placeholderImg}
-                alt={car.model}
-                className="w-full h-48 object-cover mb-4 rounded-lg"
-              />
-              <h2 className="text-xl font-semibold mb-2">
+            <div key={car._id} className="bg-white p-4 shadow-lg rounded-lg">
+              <div className="relative w-full h-64 md:h-48 lg:h-56 overflow-hidden rounded-lg">
+                <img
+                  src={car.imageUrl || placeholderImg}
+                  alt={car.model}
+                  className="object-cover w-full h-full"
+                />
+              </div>
+              <h2 className="text-xl font-semibold mb-4 text-gray-800">
                 {car.make} {car.model}
               </h2>
-              <p className="text-sm mb-2">Year: {car.year}</p>
-              <p className="text-sm mb-2">Price: ${car.price}</p>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="font-medium text-gray-700">Model:</span>
+                  <span className="text-gray-600">{car.model}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-medium text-gray-700">Make:</span>
+                  <span className="text-gray-600">{car.make}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-medium text-gray-700">Vin:</span>
+                  <span className="text-gray-600">{car.vin}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-medium text-gray-700">Year:</span>
+                  <span className="text-gray-600">{car.year}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-medium text-gray-700">Price:</span>
+                  <span className="text-gray-600 text-lg font-bold">
+                    {car.currency}
+                    {car.price}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-medium text-gray-700">
+                    Shipping Status:
+                  </span>
+                  <span className="text-gray-600">{car.shippingStatus}</span>
+                </div>
+              </div>
               {isAuthenticated && <Button className="mt-4 w-full">Edit</Button>}
             </div>
           ))}
