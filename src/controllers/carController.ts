@@ -5,7 +5,7 @@ import { ShippingStatus } from '../interfaces/enums/shippingStatus.enum';
 
 // Get all cars with pagination and filters
 export const getCars = async (req: Request, res: Response) => {
-  const { page = 1, limit = 10, make, model, year, minPrice, maxPrice, shippingStatus } = req.query;
+  const { page = 1, limit = 8, make, model, year, minPrice, maxPrice, shippingStatus } = req.query;
 
   let filter: any = {};
   if (make) filter.make = make;
