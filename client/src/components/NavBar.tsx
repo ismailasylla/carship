@@ -1,15 +1,21 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { RootState } from "../store";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "../store";
+import { logout } from "../store/slices/authSlice";
 
 const NavBar: React.FC = () => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const dispatch: AppDispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/login");
+  };
 
   return (
     <nav className="bg-customGray p-4 fixed top-0 left-0 w-full z-50 shadow-md mb-4">
-      {" "}
-      {/* Added mb-4 */}
       <div className="container mx-auto flex justify-between items-center">
         <ul className="flex space-x-4">
           <li>
@@ -38,9 +44,7 @@ const NavBar: React.FC = () => {
           ) : (
             <button
               className="text-white hover:text-gray-200"
-              onClick={() => {
-                // Implement logout functionality
-              }}
+              onClick={handleLogout}
             >
               Logout
             </button>
