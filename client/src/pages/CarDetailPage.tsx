@@ -6,6 +6,7 @@ import { Car } from "../types";
 import { getCar, updateCar, deleteCar } from "../store/slices/carSlice";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import BackButton from "../components/BackButton";
 
 const CarDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -72,11 +73,9 @@ const CarDetailPage: React.FC = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
+    <div className="p-6 bg-gray-100 min-h-screen pt-20">
       <div className="container mx-auto">
-        <button onClick={() => navigate(-1)} className="text-blue-600 mb-4">
-          &larr; Back
-        </button>
+        <BackButton />
         <h1 className="text-4xl font-bold mb-8 text-center text-gray-800">
           Car Details
         </h1>

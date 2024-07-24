@@ -7,6 +7,7 @@ import placeholderImg from "../assets/placeholder.jpg";
 import { Button } from "./index";
 import Pagination from "./Pagination";
 import CarFilter from "./CarFilter";
+import { Link } from "react-router-dom"; // Import Link for navigation
 
 const CarListPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -34,6 +35,13 @@ const CarListPage: React.FC = () => {
     <div className="pt-16 p-6 bg-gray-100 min-h-screen">
       <div className="container mx-auto">
         <CarFilter />
+        {isAuthenticated && (
+          <Link to="/add-car">
+            <Button className="mb-4 bg-gray-800 text-white hover:bg-gray-600">
+              Add Car
+            </Button>
+          </Link>
+        )}
         {status === "loading" && (
           <p className="text-center text-gray-600">Loading...</p>
         )}
