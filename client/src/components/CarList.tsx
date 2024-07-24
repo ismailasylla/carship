@@ -1,34 +1,48 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for routing
+import { useNavigate } from "react-router-dom";
 import { RootState, AppDispatch } from "../store";
 import { fetchCars, setPage } from "../store/slices/carSlice";
 import placeholderImg from "../assets/placeholder.jpg";
 import { Button } from "./index";
 import Pagination from "./Pagination";
 import CarFilter from "./CarFilter";
-import { Link } from "react-router-dom"; // Import Link for navigation
+import { Link } from "react-router-dom";
+import useLocalStorage from "../hooks/useLocalStorage"; // Import the custom hook
 
 const CarListPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const navigate = useNavigate(); // Initialize navigate hook
+  const navigate = useNavigate();
   const { cars, status, error, currentPage, totalPages, filters } = useSelector(
     (state: RootState) => state.car
   );
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
+  // Use the custom hook to manage local storage
+  const [storedFilters, setStoredFilters] = useLocalStorage(
+    "carFilters",
+    filters
+  );
+
   useEffect(() => {
-    dispatch(fetchCars({ page: currentPage, ...filters }));
-  }, [dispatch, currentPage, filters]);
+    // Update filters if they have changed
+    if (JSON.stringify(filters) !== JSON.stringify(storedFilters)) {
+      setStoredFilters(filters);
+    }
+  }, [filters, storedFilters, setStoredFilters]);
+
+  useEffect(() => {
+    dispatch(fetchCars({ page: currentPage, ...storedFilters }));
+  }, [dispatch, currentPage, storedFilters]);
 
   const handlePageChange = (page: number) => {
     dispatch(setPage(page));
-    dispatch(fetchCars({ page, ...filters }));
+    dispatch(fetchCars({ page, ...storedFilters }));
   };
 
   const handleEdit = (carId: string) => {
     console.log(`Edit button clicked for carId: ${carId}`);
-    navigate(`/car/${carId}`); // Redirect to car details page
+    navigate(`/car/${carId}`);
   };
 
   return (
@@ -95,7 +109,7 @@ const CarListPage: React.FC = () => {
               {isAuthenticated && (
                 <Button
                   className="mt-4 w-full"
-                  onClick={() => handleEdit(car._id)} // Pass car._id to handleEdit
+                  onClick={() => handleEdit(car._id)}
                 >
                   Edit
                 </Button>
