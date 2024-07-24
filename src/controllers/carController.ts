@@ -47,9 +47,24 @@ export const getFilterOptions = async (req: Request, res: Response) => {
 };
 
 // Create a new car
+
 export const createCar = async (req: Request, res: Response) => {
   const { make, model, year, price, vin, currency, shippingStatus }: ICar = req.body;
 
+  // Validate the presence of required fields
+  if (!make || !model || !year || !price || !vin || !currency) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  // Validate year and price
+  if (year < 1900 || year > new Date().getFullYear()) {
+    return res.status(400).json({ message: 'Invalid year' });
+  }
+  if (price < 0) {
+    return res.status(400).json({ message: 'Invalid price' });
+  }
+
+  // Create a new car instance
   const car = new Car({
     make,
     model,
@@ -61,8 +76,9 @@ export const createCar = async (req: Request, res: Response) => {
   });
 
   try {
-    await car.save();
-    res.status(201).json(car);
+    // Save the car to the database
+    const savedCar = await car.save();
+    res.status(201).json(savedCar);
   } catch (error) {
     console.error('Error creating car:', error);
     res.status(500).json({ message: 'Server error', error: (error as Error).message });

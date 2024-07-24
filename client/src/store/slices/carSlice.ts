@@ -5,7 +5,8 @@ import {
   updateCarRequest as updateCarAPI,
   deleteCarRequest as deleteCarAPI,
   fetchFilterOptions as fetchFilterOptionsAPI,
-  fetchCarRequest as fetchCarAPI // Import the fetchCarRequest function
+  fetchCarRequest as fetchCarAPI, // Import the fetchCarRequest function
+  addCarRequest
 } from '../../utils/apiCalls';
 import { Car } from '../../types';
 import { RootState } from '../../store';
@@ -102,7 +103,7 @@ export const addCar = createAsyncThunk<Car, Car, { rejectValue: string }>(
       return thunkAPI.rejectWithValue('User not authenticated');
     }
     try {
-      const newCar = await addCarAPI(car);
+      const newCar = await addCarRequest(car);
       return newCar;
     } catch (error) {
       return thunkAPI.rejectWithValue('Failed to add car');
