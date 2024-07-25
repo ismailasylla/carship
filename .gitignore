@@ -1,5 +1,30 @@
-# dependencies
-node_modules
-.env*.local
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Environment variables
 .env
-Documentation.md
+
+# Build output
+dist/
+build/
+
+# TypeScript
+*.tsbuildinfo
+
+# Vite
+.vite/
+
+# Logs
+*.log
+
+# IDE files
+.vscode/
+.idea/
+
+# MacOS
+.DS_Store
+
+# Linux
+*.swp
