@@ -1,4 +1,8 @@
-# Car Shipping Management System API
+# Car Shipping Management System
+
+## Start the application concurrently:
+
+npm run dev
 
 ## Endpoints Documentation
 
@@ -163,6 +167,7 @@ http://localhost:5001/api
 - **Description:** Defines the environment variables.
 - **Variables:**
   ```
+  PORT: 5001
   JWT_SECRET=your_jwt_secret
   MONGO_URI=your_mongo_connection_string
   ```

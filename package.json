@@ -3,7 +3,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "dev": "concurrently \"npm run start\" \"npm run client\"",
     "start": "ts-node-dev src/server.ts",
+    "client": "npm --prefix ./client run dev",
+    "build": "npm --prefix ./client run build",
+    "lint": "npm --prefix ./client run lint",
+    "preview": "npm --prefix ./client run preview",
     "test": "jest"
   },
   "keywords": [],
@@ -21,6 +26,7 @@
     "@types/react-router-dom": "^5.3.3",
     "@types/socket.io": "^3.0.2",
     "@types/supertest": "^6.0.2",
+    "concurrently": "^8.2.2",
     "jest": "^29.7.0",
     "supertest": "^7.0.0",
     "ts-jest": "^29.2.3",
