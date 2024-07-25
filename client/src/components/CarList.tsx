@@ -13,7 +13,7 @@ import { Button } from "./buttons";
 import Pagination from "./filter/Pagination";
 import CarFilter from "./filter/CarFilter";
 import { Link, useNavigate } from "react-router-dom";
-import useLocalStorage from "../hooks/useLocalStorage";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 import { Car } from "../types";
 
 const CarListPage: React.FC = () => {
@@ -31,7 +31,6 @@ const CarListPage: React.FC = () => {
   );
 
   useEffect(() => {
-    // Update filters if they have changed
     if (JSON.stringify(filters) !== JSON.stringify(storedFilters)) {
       setStoredFilters(filters);
     }

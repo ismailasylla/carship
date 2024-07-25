@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../store";
 import { loginUser } from "../store/slices/authSlice";
 import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom"; // Import Link
+import { Link } from "react-router-dom";
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -62,17 +62,16 @@ const LoginPage: React.FC = () => {
           </button>
         </form>
         {authState.loading && (
-          <p className="mt-4 text-center text-blue-500">Loading...</p>
+          <p className="text-center text-gray-600 mt-4">Loading...</p>
         )}
         {authState.error && (
-          <p className="mt-4 text-center text-red-500">{authState.error}</p>
+          <p className="text-center text-red-500 mt-4">{authState.error}</p>
         )}
-        <p className="mt-4 text-center">
-          Don't have an account?{" "}
+        <div className="mt-4 text-center">
           <Link to="/register" className="text-blue-500 hover:underline">
-            Register
+            Don't have an account? Register here.
           </Link>
-        </p>
+        </div>
       </div>
     </div>
   );

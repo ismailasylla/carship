@@ -59,3 +59,26 @@ export const loginUser = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Server error', error: (error as Error).message });
   }
 };
+
+export const verifyToken = async (req: Request, res: Response) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    const jwtSecret = process.env.JWT_SECRET;
+
+    if (!jwtSecret || !token) {
+      return res.status(401).json({ message: 'No token provided' });
+    }
+
+    const decoded = jwt.verify(token, jwtSecret) as { id: string };
+    const user = await User.findById(decoded.id).select('-password').exec();
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error("Error in verifyToken:", error);
+    res.status(401).json({ message: 'Token validation failed', error: (error as Error).message });
+  }
+};
