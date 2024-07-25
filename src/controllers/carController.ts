@@ -47,7 +47,6 @@ export const getFilterOptions = async (req: Request, res: Response) => {
 };
 
 // Create a new car
-
 export const createCar = async (req: Request, res: Response) => {
   const { make, model, year, price, vin, currency, shippingStatus }: ICar = req.body;
 

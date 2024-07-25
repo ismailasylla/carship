@@ -6,7 +6,7 @@ import { Car } from "../types";
 import { getCar, updateCar, deleteCar } from "../store/slices/carSlice";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import BackButton from "../components/BackButton";
+import BackButton from "../components/buttons/BackButton";
 
 const CarDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();

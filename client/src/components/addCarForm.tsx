@@ -6,9 +6,9 @@ import { Car } from "../types";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
-import BackButton from "./BackButton";
+import { BackButton } from "./buttons";
 
-const CarForm: React.FC = () => {
+const AddCarForm: React.FC = () => {
   const [form, setForm] = useState<{
     make: string;
     model: string;
@@ -252,4 +252,4 @@ const CarForm: React.FC = () => {
   );
 };
 
-export default CarForm;
+export default AddCarForm;

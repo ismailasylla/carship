@@ -4,11 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { RootState, AppDispatch } from "../store";
 import { fetchCars, setPage } from "../store/slices/carSlice";
 import placeholderImg from "../assets/placeholder.jpg";
-import { Button } from "./index";
-import Pagination from "./Pagination";
-import CarFilter from "./CarFilter";
+import { Button } from "./buttons";
+import Pagination from "./filter/Pagination";
+import CarFilter from "./filter/CarFilter";
 import { Link } from "react-router-dom";
-import useLocalStorage from "../hooks/useLocalStorage"; // Import the custom hook
+import useLocalStorage from "../hooks/useLocalStorage";
 
 const CarListPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -18,7 +18,7 @@ const CarListPage: React.FC = () => {
   );
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
-  // Use the custom hook to manage local storage
+  // Custom hook to manage local storage
   const [storedFilters, setStoredFilters] = useLocalStorage(
     "carFilters",
     filters

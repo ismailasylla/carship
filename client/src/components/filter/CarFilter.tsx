@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../store";
+import { RootState, AppDispatch } from "../../store";
 import {
   setFilters,
   fetchCars,
   fetchFilterOptions,
-} from "../store/slices/carSlice";
+} from "../../store/slices/carSlice";
 
 const CarFilter: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();

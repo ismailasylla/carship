@@ -8,7 +8,7 @@ router.route('/')
   .post(createCar);
 
 router.route('/:id')
-  .get(getCarById)    // New route to get a single car by ID
+  .get(getCarById)
   .put(updateCar)
   .delete(deleteCar);
 
