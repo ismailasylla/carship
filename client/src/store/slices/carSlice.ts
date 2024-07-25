@@ -3,47 +3,57 @@ import {
   fetchCars as fetchCarsAPI,
   addCarRequest as addCarAPI,
   updateCarRequest as updateCarAPI,
-  deleteCarRequest as deleteCarAPI
+  deleteCarRequest as deleteCarAPI,
+  fetchFilterOptions as fetchFilterOptionsAPI,
+  fetchCarRequest as fetchCarAPI,
 } from '../../utils/apiCalls';
 import { Car } from '../../types';
-import { RootState } from '../../store';
+import store, { RootState } from '../../store';
+import socket from '../../utils/websocket';
 
-export interface CarState {
+interface CarState {
   cars: Car[];
-  models: string[];
-  makes: string[];
-  years: string[];
+  currentCar: Car | null; 
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
-  currentCar: Car | null;
-  totalPages: number;
   currentPage: number;
+  totalPages: number;
   filters: {
     model: string;
     year: string;
     make: string;
   };
+  filterOptions: {
+    models: string[];
+    years: string[];
+    makes: string[];
+  };
 }
 
 const initialState: CarState = {
   cars: [],
-  models: [],
-  makes: [],
-  years: [],
+  currentCar: null,
   status: 'idle',
   error: null,
-  currentCar: null,
-  totalPages: 1,
   currentPage: 1,
+  totalPages: 0,
   filters: {
     model: '',
     year: '',
     make: ''
+  },
+  filterOptions: {
+    models: [],
+    years: [],
+    makes: []
   }
 };
 
 interface FetchCarsParams {
   page: number;
+  model: string;
+  year: string;
+  make: string;
 }
 
 interface FetchCarsResponse {
@@ -51,18 +61,11 @@ interface FetchCarsResponse {
   totalPages: number;
 }
 
-// Fetch cars with pagination and filters
 export const fetchCars = createAsyncThunk<FetchCarsResponse, FetchCarsParams, { rejectValue: string }>(
   'car/fetchCars',
-  async ({ page }, thunkAPI) => {
-    const state = thunkAPI.getState() as RootState;
+  async ({ page, model, year, make }, thunkAPI) => {
     try {
-      const { cars = [], totalPages = 1 } = await fetchCarsAPI(
-        page,
-        state.car.filters.model,
-        state.car.filters.year,
-        state.car.filters.make
-      );
+      const { cars = [], totalPages = 1 } = await fetchCarsAPI(page, model, year, make);
       return { cars, totalPages };
     } catch (error) {
       return thunkAPI.rejectWithValue('Failed to fetch cars');
@@ -70,7 +73,6 @@ export const fetchCars = createAsyncThunk<FetchCarsResponse, FetchCarsParams, { 
   }
 );
 
-// Fetch filter options
 export const fetchFilterOptions = createAsyncThunk<{
   models: string[];
   makes: string[];
@@ -79,8 +81,7 @@ export const fetchFilterOptions = createAsyncThunk<{
   'car/fetchFilterOptions',
   async (_, thunkAPI) => {
     try {
-      const response = await fetch('/api/cars/filters');
-      const data = await response.json();
+      const data = await fetchFilterOptionsAPI();
       return data;
     } catch (error) {
       return thunkAPI.rejectWithValue('Failed to fetch filter options');
@@ -88,7 +89,6 @@ export const fetchFilterOptions = createAsyncThunk<{
   }
 );
 
-// Add a new car
 export const addCar = createAsyncThunk<Car, Car, { rejectValue: string }>(
   'car/addCar',
   async (car, thunkAPI) => {
@@ -105,7 +105,6 @@ export const addCar = createAsyncThunk<Car, Car, { rejectValue: string }>(
   }
 );
 
-// Update a car
 export const updateCar = createAsyncThunk<Car, Car, { rejectValue: string }>(
   'car/updateCar',
   async (car, thunkAPI) => {
@@ -122,7 +121,6 @@ export const updateCar = createAsyncThunk<Car, Car, { rejectValue: string }>(
   }
 );
 
-// Delete a car
 export const deleteCar = createAsyncThunk<string, string, { rejectValue: string }>(
   'car/deleteCar',
   async (id, thunkAPI) => {
@@ -139,20 +137,11 @@ export const deleteCar = createAsyncThunk<string, string, { rejectValue: string 
   }
 );
 
-// Get a single car by ID
 export const getCar = createAsyncThunk<Car, string, { rejectValue: string }>(
   'car/getCar',
   async (id, thunkAPI) => {
-    const state = thunkAPI.getState() as RootState;
     try {
-      const { cars } = await fetchCarsAPI(
-        1, // Default page number
-        state.car.filters.model,
-        state.car.filters.year,
-        state.car.filters.make
-      );
-      const car = cars.find((car) => car._id === id);
-      if (!car) throw new Error('Car not found');
+      const car = await fetchCarAPI(id);
       return car;
     } catch (error) {
       return thunkAPI.rejectWithValue('Failed to fetch car');
@@ -188,6 +177,28 @@ const carSlice = createSlice({
         state.status = 'failed';
         state.error = action.payload || 'Failed to fetch cars';
       })
+      .addCase(fetchFilterOptions.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchFilterOptions.fulfilled, (state, action: PayloadAction<{ models: string[], makes: string[], years: string[] }>) => {
+        state.status = 'succeeded';
+        state.filterOptions = action.payload;
+      })
+      .addCase(fetchFilterOptions.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload || 'Failed to fetch filter options';
+      })
+      .addCase(getCar.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(getCar.fulfilled, (state, action: PayloadAction<Car>) => {
+        state.status = 'succeeded';
+        state.currentCar = action.payload;
+      })
+      .addCase(getCar.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload || 'Failed to fetch car';
+      })
       .addCase(addCar.pending, (state) => {
         state.status = 'loading';
       })
@@ -204,9 +215,10 @@ const carSlice = createSlice({
       })
       .addCase(updateCar.fulfilled, (state, action: PayloadAction<Car>) => {
         state.status = 'succeeded';
-        state.cars = state.cars.map((car) =>
-          car._id === action.payload._id ? action.payload : car
-        );
+        const index = state.cars.findIndex((car) => car._id === action.payload._id);
+        if (index !== -1) {
+          state.cars[index] = action.payload;
+        }
       })
       .addCase(updateCar.rejected, (state, action) => {
         state.status = 'failed';
@@ -222,26 +234,14 @@ const carSlice = createSlice({
       .addCase(deleteCar.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload || 'Failed to delete car';
-      })
-      .addCase(getCar.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(getCar.fulfilled, (state, action: PayloadAction<Car>) => {
-        state.status = 'succeeded';
-        state.currentCar = action.payload;
-      })
-      .addCase(getCar.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload || 'Failed to fetch car';
-      })
-      .addCase(fetchFilterOptions.fulfilled, (state, action: PayloadAction<{ models: string[], makes: string[], years: string[] }>) => {
-        state.models = action.payload.models;
-        state.makes = action.payload.makes;
-        state.years = action.payload.years;
       });
   },
 });
 
+// listens to WebSocket messages
+socket.on('updateCars', (cars: Car[]) => {
+  store.dispatch(updateCars(cars));
+});
 export const { updateCars, setPage, setFilters } = carSlice.actions;
 
 export default carSlice.reducer;

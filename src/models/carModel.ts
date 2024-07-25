@@ -16,7 +16,7 @@ const carSchema = new Schema<ICar>({
   }
 }, { timestamps: true });
 
-// Create indexes for efficient querying
+// indexes for efficient querying
 carSchema.index({ make: 1 });
 carSchema.index({ model: 1 });
 carSchema.index({ year: 1 });

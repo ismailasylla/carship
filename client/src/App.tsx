@@ -7,7 +7,7 @@ const HomePage = lazy(() => import("./pages/HomePage"));
 const CarDetailPage = lazy(() => import("./pages/CarDetailPage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const RegisterPage = lazy(() => import("./pages/RegisterPage"));
-const CarForm = lazy(() => import("./components/CarForm"));
+const AddCarForm = lazy(() => import("./components/addCarForm"));
 
 const App: React.FC = () => {
   return (
@@ -21,7 +21,7 @@ const App: React.FC = () => {
           <Route path="/register" element={<RegisterPage />} />
           <Route
             path="/add-car"
-            element={<AuthRoute element={<CarForm />} />}
+            element={<AuthRoute element={<AddCarForm />} />}
           />
         </Routes>
       </Suspense>

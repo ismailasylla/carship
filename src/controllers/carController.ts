@@ -1,118 +1,156 @@
 import { Request, Response } from 'express';
 import Car from '../models/carModel';
 import { ICar } from '../interfaces/car';
+import { ShippingStatus } from '../interfaces/enums/shippingStatus.enum';
+import { emitCarUpdate } from '../server';
 
-// Get all cars
 export const getCars = async (req: Request, res: Response) => {
-  const { page = 1, limit = 10, make, model, year, minPrice, maxPrice, shippingStatus } = req.query;
+  const { page = 1, limit = 8, make, model, year, minPrice, maxPrice, shippingStatus } = req.query;
 
-  // Build the filter query object
   let filter: any = {};
+
   if (make) filter.make = make;
   if (model) filter.model = model;
-  if (year) filter.year = parseInt(year as string);
+  if (year) filter.year = parseInt(year as string, 10);
   if (minPrice) filter.price = { ...filter.price, $gte: parseFloat(minPrice as string) };
   if (maxPrice) filter.price = { ...filter.price, $lte: parseFloat(maxPrice as string) };
   if (shippingStatus) filter.shippingStatus = shippingStatus;
 
   try {
-    // Fetch cars with pagination and filtering
+
     const cars = await Car.find(filter)
-      .skip((parseInt(page as string) - 1) * parseInt(limit as string))
-      .limit(parseInt(limit as string))
-      .exec();
-
-    // Count total cars for pagination info
+      .skip((+page - 1) * +limit)
+      .limit(+limit)
+      
     const totalCars = await Car.countDocuments(filter);
+    const totalPages = Math.ceil(totalCars / +limit);
 
-    res.json({
-      totalCars,
-      page: parseInt(page as string),
-      totalPages: Math.ceil(totalCars / parseInt(limit as string)),
-      cars,
-    });
+    // Send the response with cars and total pages
+    res.status(200).json({ cars, totalPages });
   } catch (error) {
+    // Handle and log errors
     console.error('Error fetching cars:', error);
-    res.status(500).json({ message: 'Error fetching cars' });
+    res.status(500).json({ message: 'Server error', error: (error as Error).message });
   }
 };
 
-// Add a new car
-export const addCar = async (req: Request, res: Response) => {
-  const { make, model, year, price, vin, currency, shippingStatus } = req.body;
+// Get filter options for cars (make, model, year)
+export const getFilterOptions = async (req: Request, res: Response) => {
+  try {
+    const makes = await Car.distinct('make');
+    const models = await Car.distinct('model');
+    const years = await Car.distinct('year');
+
+    res.status(200).json({ makes, models, years });
+  } catch (error) {
+    console.error('Error fetching filter options:', error);
+    res.status(500).json({ message: 'Server error', error: (error as Error).message });
+  }
+};
+
+// Create a new car
+export const createCar = async (req: Request, res: Response) => {
+  const { make, model, year, price, vin, currency, shippingStatus }: ICar = req.body;
+
+  // Validate the presence of required fields
+  if (!make || !model || !year || !price || !vin || !currency) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  // Validate year and price
+  if (year < 1900 || year > new Date().getFullYear()) {
+    return res.status(400).json({ message: 'Invalid year' });
+  }
+  if (price < 0) {
+    return res.status(400).json({ message: 'Invalid price' });
+  }
+
+  // Create a new car instance
+  const car = new Car({
+    make,
+    model,
+    year,
+    price,
+    vin,
+    currency,
+    shippingStatus: shippingStatus || ShippingStatus.Pending,
+  });
 
   try {
-    const newCar: ICar = new Car({ make, model, year, price, vin, currency, shippingStatus });
-    const savedCar: ICar = await newCar.save();
+    // Save the car to the database
+    const savedCar = await car.save();
+    const cars = await Car.find({});
+    emitCarUpdate(cars);
     res.status(201).json(savedCar);
   } catch (error) {
-    console.error('Error adding car:', error);
-    res.status(500).json({ message: 'Error adding car' });
+    console.error('Error creating car:', error);
+    res.status(500).json({ message: 'Server error', error: (error as Error).message });
   }
 };
 
-// Update car details (price, model, etc.)
+// Update a car
 export const updateCar = async (req: Request, res: Response) => {
-  const { _id } = req.params;
-  const updates = req.body;
+  const { id } = req.params;
+  const { make, model, year, price, vin, currency, shippingStatus }: ICar = req.body;
 
   try {
-    const updatedCar: ICar | null = await Car.findByIdAndUpdate(_id, { $set: updates }, { new: true });
-    if (!updatedCar) {
+    const car = await Car.findById(id);
+
+    if (!car) {
       return res.status(404).json({ message: 'Car not found' });
     }
-    res.json(updatedCar);
+
+    await Car.updateOne(
+      { _id: id },
+      { $set: { make, model, year, price, vin, currency, shippingStatus } }
+    );
+
+    const updatedCar = await Car.findById(id);
+    const cars = await Car.find({});
+    emitCarUpdate(cars);
+
+    res.status(200).json(updatedCar);
   } catch (error) {
     console.error('Error updating car:', error);
-    res.status(500).json({ message: 'Error updating car' });
-  }
-};
-
-// Update car shipping status
-export const updateCarStatus = async (req: Request, res: Response) => {
-  const { _id } = req.params;
-  const { shippingStatus } = req.body;
-
-  try {
-    const updatedCar: ICar | null = await Car.findByIdAndUpdate(_id, { shippingStatus }, { new: true });
-    if (!updatedCar) {
-      return res.status(404).json({ message: 'Car not found' });
-    }
-    res.json(updatedCar);
-  } catch (error) {
-    console.error('Error updating car status:', error);
-    res.status(500).json({ message: 'Error updating car status' });
+    res.status(500).json({ message: 'Server error', error: (error as Error).message });
   }
 };
 
 // Delete a car
 export const deleteCar = async (req: Request, res: Response) => {
-  const { _id } = req.params;
+  const { id } = req.params;
 
   try {
-    const deletedCar: ICar | null = await Car.findByIdAndDelete(_id);
-    if (!deletedCar) {
-      return res.status(404).json({ message: 'Car not found' });
-    }
-    res.json({ message: 'Car deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting car:', error);
-    res.status(500).json({ message: 'Error deleting car' });
-  }
-};
+    const car = await Car.findById(id);
 
-// Get a car by ID
-export const getCarById = async (req: Request, res: Response) => {
-  const { _id } = req.params;
-
-  try {
-    const car: ICar | null = await Car.findById(_id);
     if (!car) {
       return res.status(404).json({ message: 'Car not found' });
     }
-    res.json(car);
+
+    await Car.deleteOne({ _id: id });
+    const cars = await Car.find({}); 
+    emitCarUpdate(cars);
+    res.status(200).json({ message: 'Car deleted' });
+  } catch (error) {
+    console.error('Error deleting car:', error);
+    res.status(500).json({ message: 'Server error', error: (error as Error).message });
+  }
+};
+
+// Fetch a single car by ID
+export const getCarById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const car = await Car.findById(id);
+
+    if (!car) {
+      return res.status(404).json({ message: 'Car not found' });
+    }
+
+    res.status(200).json(car);
   } catch (error) {
     console.error('Error fetching car:', error);
-    res.status(500).json({ message: 'Error fetching car' });
+    res.status(500).json({ message: 'Server error', error: (error as Error).message });
   }
 };

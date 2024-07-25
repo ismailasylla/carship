@@ -4,6 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../store";
 import { Car } from "../types";
 import { getCar, updateCar, deleteCar } from "../store/slices/carSlice";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import BackButton from "../components/buttons/BackButton";
 
 const CarDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -36,35 +39,46 @@ const CarDetailPage: React.FC = () => {
     setForm((prevForm) => (prevForm ? { ...prevForm, [name]: value } : null));
   };
 
-  const handleUpdate = (e: React.FormEvent) => {
+  const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      alert("You must be logged in to update a car.");
+      toast.error("You must be logged in to update a car.");
       return;
     }
     if (form) {
-      dispatch(updateCar(form));
-      navigate("/");
+      try {
+        await dispatch(updateCar(form)).unwrap();
+        toast.success("Car details updated successfully!");
+        setTimeout(() => navigate("/"), 2000);
+      } catch (error) {
+        toast.error("Failed to update car. Please try again.");
+      }
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!isAuthenticated) {
-      alert("You must be logged in to delete a car.");
+      toast.error("You must be logged in to delete a car.");
       return;
     }
     if (id) {
-      dispatch(deleteCar(id));
-      navigate("/");
+      try {
+        await dispatch(deleteCar(id)).unwrap();
+        toast.success("Car deleted successfully!");
+
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 2000);
+      } catch (error) {
+        toast.error("Failed to delete car. Please try again.");
+      }
     }
   };
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
+    <div className="p-6 bg-gray-100 min-h-screen pt-20">
       <div className="container mx-auto">
-        <button onClick={() => navigate(-1)} className="text-blue-600 mb-4">
-          &larr; Back
-        </button>
+        <BackButton />
         <h1 className="text-4xl font-bold mb-8 text-center text-gray-800">
           Car Details
         </h1>
@@ -161,8 +175,8 @@ const CarDetailPage: React.FC = () => {
                 className="w-full p-2 border border-gray-300 rounded"
                 required
               >
-                <option value="pending">Pending</option>
-                <option value="shipped">Shipped</option>
+                <option value="Pending">Pending</option>
+                <option value="Shipped">Shipped</option>
                 {/* Add more statuses if needed */}
               </select>
             </div>
@@ -186,6 +200,7 @@ const CarDetailPage: React.FC = () => {
           <p className="text-gray-500 text-center text-xl">Loading...</p>
         )}
       </div>
+      <ToastContainer />
     </div>
   );
 };

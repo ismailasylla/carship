@@ -4,15 +4,21 @@ import { RootState, AppDispatch } from "../store";
 import { fetchCars, updateCars, addCar } from "../store/slices/carSlice";
 import CarList from "../components/CarList";
 import socket from "../utils/websocket";
+import { Car } from "../types";
 
 const HomePage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const cars = useSelector((state: RootState) => state.car.cars);
-  const status = useSelector((state: RootState) => state.car.status);
-  const error = useSelector((state: RootState) => state.car.error);
+  const { cars, status, error } = useSelector((state: RootState) => state.car);
 
   useEffect(() => {
-    dispatch(fetchCars()).then((action) => {
+    // Example parameters, replace with actual values or logic as needed
+    const page = 1;
+    const model = "";
+    const year = "";
+    const make = "";
+
+    // Fetch cars
+    dispatch(fetchCars({ page, model, year, make })).then((action) => {
       if (fetchCars.fulfilled.match(action)) {
         console.log("Fetched cars:", action.payload);
       } else {
@@ -20,24 +26,33 @@ const HomePage: React.FC = () => {
       }
     });
 
-    socket.on("carUpdated", (updatedCars) => {
+    // Handle WebSocket events
+    const handleCarUpdate = (updatedCars: Car[]) => {
       dispatch(updateCars(updatedCars));
-    });
+    };
 
-    socket.on("carAdded", (newCar) => {
+    const handleCarAdd = (newCar: Car) => {
       dispatch(addCar(newCar));
-    });
+    };
 
+    socket.on("carUpdated", handleCarUpdate);
+    socket.on("carAdded", handleCarAdd);
+
+    // Clean up WebSocket listeners on component unmount
     return () => {
-      socket.off("carUpdated");
-      socket.off("carAdded");
+      socket.off("carUpdated", handleCarUpdate);
+      socket.off("carAdded", handleCarAdd);
     };
   }, [dispatch]);
 
   return (
-    <div>
-      {status === "loading" && <p>Loading...</p>}
-      {status === "failed" && <p>{error}</p>}
+    <div className="container mx-auto p-6">
+      {status === "loading" && (
+        <p className="text-center text-gray-600">Loading...</p>
+      )}
+      {status === "failed" && (
+        <p className="text-center text-red-600">Error: {error}</p>
+      )}
       <CarList cars={cars} />
     </div>
   );

@@ -3,21 +3,20 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
-// Load environment variables
+
 dotenv.config();
 
-// Import routes
+
 import userRoutes from './routes/userRoutes';
 import carRoutes from './routes/carRoutes';
 
-// Create app instance
 const app = express();
 
 app.use(express.json());
 app.use('/api/auth', userRoutes);
 app.use('/api/cars', carRoutes);
 
-// Ensure Mongoose connection before running tests
+
 const mongoURI = process.env.MONGO_URI || '';
 if (!mongoURI) {
   throw new Error('MONGO_URI is not defined in the environment variables');
@@ -47,5 +46,4 @@ describe('Server', () => {
     expect(response.status).toBe(201);
   });
 
-  // More tests for other endpoints...
 });

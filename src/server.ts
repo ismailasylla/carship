@@ -9,15 +9,12 @@ import config from './config/service';
 
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Routes
 app.use('/api/cars', carRoutes);
 app.use('/api/auth', userRoutes);
 
-// MongoDB connection
 const mongoUri = config.MONGO_URI;
 if (!mongoUri) {
   throw new Error('MONGO_URI is not defined');
@@ -51,7 +48,6 @@ export const emitCarUpdate = (updatedCars: any) => {
   io.emit('carUpdated', updatedCars);
 };
 
-// Start server with default value if PORT is undefined
 const port = config.PORT || '3000'; 
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
