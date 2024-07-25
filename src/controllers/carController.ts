@@ -2,28 +2,26 @@ import { Request, Response } from 'express';
 import Car from '../models/carModel';
 import { ICar } from '../interfaces/car';
 import { ShippingStatus } from '../interfaces/enums/shippingStatus.enum';
+import { emitCarUpdate } from '../server';
 
-// Get all cars with pagination and filters
 export const getCars = async (req: Request, res: Response) => {
   const { page = 1, limit = 8, make, model, year, minPrice, maxPrice, shippingStatus } = req.query;
 
   let filter: any = {};
 
-  // Add filters based on query parameters
   if (make) filter.make = make;
   if (model) filter.model = model;
-  if (year) filter.year = parseInt(year as string, 10); // Ensure year is parsed as an integer
+  if (year) filter.year = parseInt(year as string, 10);
   if (minPrice) filter.price = { ...filter.price, $gte: parseFloat(minPrice as string) };
   if (maxPrice) filter.price = { ...filter.price, $lte: parseFloat(maxPrice as string) };
   if (shippingStatus) filter.shippingStatus = shippingStatus;
 
   try {
-    // Fetch the cars with the specified filters, pagination, and limit
+
     const cars = await Car.find(filter)
       .skip((+page - 1) * +limit)
-      .limit(+limit);
-
-    // Count the total number of documents matching the filter
+      .limit(+limit)
+      
     const totalCars = await Car.countDocuments(filter);
     const totalPages = Math.ceil(totalCars / +limit);
 
@@ -81,6 +79,8 @@ export const createCar = async (req: Request, res: Response) => {
   try {
     // Save the car to the database
     const savedCar = await car.save();
+    const cars = await Car.find({});
+    emitCarUpdate(cars);
     res.status(201).json(savedCar);
   } catch (error) {
     console.error('Error creating car:', error);
@@ -106,6 +106,8 @@ export const updateCar = async (req: Request, res: Response) => {
     );
 
     const updatedCar = await Car.findById(id);
+    const cars = await Car.find({});
+    emitCarUpdate(cars);
 
     res.status(200).json(updatedCar);
   } catch (error) {
@@ -126,6 +128,8 @@ export const deleteCar = async (req: Request, res: Response) => {
     }
 
     await Car.deleteOne({ _id: id });
+    const cars = await Car.find({}); 
+    emitCarUpdate(cars);
     res.status(200).json({ message: 'Car deleted' });
   } catch (error) {
     console.error('Error deleting car:', error);

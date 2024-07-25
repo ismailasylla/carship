@@ -1,14 +1,20 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { RootState, AppDispatch } from "../store";
-import { fetchCars, setPage } from "../store/slices/carSlice";
+import {
+  fetchCars,
+  setPage,
+  setFilters,
+  updateCars,
+} from "../store/slices/carSlice";
+import useSocket from "../hooks/useSocket";
 import placeholderImg from "../assets/placeholder.jpg";
 import { Button } from "./buttons";
 import Pagination from "./filter/Pagination";
 import CarFilter from "./filter/CarFilter";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useLocalStorage from "../hooks/useLocalStorage";
+import { Car } from "../types";
 
 const CarListPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -41,9 +47,18 @@ const CarListPage: React.FC = () => {
   };
 
   const handleEdit = (carId: string) => {
-    console.log(`Edit button clicked for carId: ${carId}`);
     navigate(`/car/${carId}`);
   };
+
+  // listen for WebSocket events
+  useSocket("updateCars", (updatedCars: Car[]) => {
+    dispatch(updateCars(updatedCars));
+  });
+
+  // Debugging state I WILL REMOVE LATER
+  useEffect(() => {
+    console.log("Current cars in CarListPage:", cars);
+  }, [cars]);
 
   return (
     <div className="pt-16 p-6 bg-gray-100 min-h-screen">

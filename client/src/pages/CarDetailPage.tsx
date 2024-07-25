@@ -65,7 +65,10 @@ const CarDetailPage: React.FC = () => {
       try {
         await dispatch(deleteCar(id)).unwrap();
         toast.success("Car deleted successfully!");
-        setTimeout(() => navigate("/"), 2000);
+
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 2000);
       } catch (error) {
         toast.error("Failed to delete car. Please try again.");
       }

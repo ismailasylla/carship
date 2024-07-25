@@ -7,6 +7,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { BackButton } from "./buttons";
+import socket from "../utils/websocket";
 
 const AddCarForm: React.FC = () => {
   const [form, setForm] = useState<{
@@ -100,8 +101,12 @@ const AddCarForm: React.FC = () => {
     try {
       await dispatch(addCar(carData)).unwrap();
       toast.success("Car details added successfully!");
+
+      // Emit WebSocket event
+      socket.emit("carAdded", carData);
+
       setTimeout(() => {
-        navigate("/"); // Redirect to homepage after a short delay
+        window.location.href = "/";
       }, 2000);
     } catch (error) {
       console.error("Failed to add car:", error);
@@ -117,8 +122,6 @@ const AddCarForm: React.FC = () => {
           Add New Car
         </h1>
         <div className="mt-6">
-          {" "}
-          {/* Added margin-top to the form container */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="make" className="block text-gray-600 mb-1">

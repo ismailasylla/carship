@@ -8,7 +8,8 @@ import {
   fetchCarRequest as fetchCarAPI,
 } from '../../utils/apiCalls';
 import { Car } from '../../types';
-import { RootState } from '../../store';
+import store, { RootState } from '../../store';
+import socket from '../../utils/websocket';
 
 interface CarState {
   cars: Car[];
@@ -237,6 +238,10 @@ const carSlice = createSlice({
   },
 });
 
+// listens to WebSocket messages
+socket.on('updateCars', (cars: Car[]) => {
+  store.dispatch(updateCars(cars));
+});
 export const { updateCars, setPage, setFilters } = carSlice.actions;
 
 export default carSlice.reducer;
