@@ -5,15 +5,14 @@ import {
   updateCarRequest as updateCarAPI,
   deleteCarRequest as deleteCarAPI,
   fetchFilterOptions as fetchFilterOptionsAPI,
-  fetchCarRequest as fetchCarAPI, // Import the fetchCarRequest function
-  addCarRequest
+  fetchCarRequest as fetchCarAPI,
 } from '../../utils/apiCalls';
 import { Car } from '../../types';
 import { RootState } from '../../store';
 
 interface CarState {
   cars: Car[];
-  currentCar: Car | null; // Add this to store the current car details
+  currentCar: Car | null; 
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
   currentPage: number;
@@ -32,7 +31,7 @@ interface CarState {
 
 const initialState: CarState = {
   cars: [],
-  currentCar: null, // Initialize to null
+  currentCar: null,
   status: 'idle',
   error: null,
   currentPage: 1,
@@ -63,15 +62,9 @@ interface FetchCarsResponse {
 
 export const fetchCars = createAsyncThunk<FetchCarsResponse, FetchCarsParams, { rejectValue: string }>(
   'car/fetchCars',
-  async ({ page }, thunkAPI) => {
-    const state = thunkAPI.getState() as RootState;
+  async ({ page, model, year, make }, thunkAPI) => {
     try {
-      const { cars = [], totalPages = 1 } = await fetchCarsAPI(
-        page,
-        state.car.filters.model,
-        state.car.filters.year,
-        state.car.filters.make
-      );
+      const { cars = [], totalPages = 1 } = await fetchCarsAPI(page, model, year, make);
       return { cars, totalPages };
     } catch (error) {
       return thunkAPI.rejectWithValue('Failed to fetch cars');
@@ -103,7 +96,7 @@ export const addCar = createAsyncThunk<Car, Car, { rejectValue: string }>(
       return thunkAPI.rejectWithValue('User not authenticated');
     }
     try {
-      const newCar = await addCarRequest(car);
+      const newCar = await addCarAPI(car);
       return newCar;
     } catch (error) {
       return thunkAPI.rejectWithValue('Failed to add car');
@@ -143,7 +136,6 @@ export const deleteCar = createAsyncThunk<string, string, { rejectValue: string 
   }
 );
 
-// New thunk to fetch a single car
 export const getCar = createAsyncThunk<Car, string, { rejectValue: string }>(
   'car/getCar',
   async (id, thunkAPI) => {
@@ -184,19 +176,63 @@ const carSlice = createSlice({
         state.status = 'failed';
         state.error = action.payload || 'Failed to fetch cars';
       })
+      .addCase(fetchFilterOptions.pending, (state) => {
+        state.status = 'loading';
+      })
       .addCase(fetchFilterOptions.fulfilled, (state, action: PayloadAction<{ models: string[], makes: string[], years: string[] }>) => {
+        state.status = 'succeeded';
         state.filterOptions = action.payload;
+      })
+      .addCase(fetchFilterOptions.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload || 'Failed to fetch filter options';
       })
       .addCase(getCar.pending, (state) => {
         state.status = 'loading';
       })
       .addCase(getCar.fulfilled, (state, action: PayloadAction<Car>) => {
         state.status = 'succeeded';
-        state.currentCar = action.payload; // Set the current car
+        state.currentCar = action.payload;
       })
       .addCase(getCar.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload || 'Failed to fetch car';
+      })
+      .addCase(addCar.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(addCar.fulfilled, (state, action: PayloadAction<Car>) => {
+        state.status = 'succeeded';
+        state.cars.push(action.payload);
+      })
+      .addCase(addCar.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload || 'Failed to add car';
+      })
+      .addCase(updateCar.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(updateCar.fulfilled, (state, action: PayloadAction<Car>) => {
+        state.status = 'succeeded';
+        const index = state.cars.findIndex((car) => car._id === action.payload._id);
+        if (index !== -1) {
+          state.cars[index] = action.payload;
+        }
+      })
+      .addCase(updateCar.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload || 'Failed to update car';
+      })
+      .addCase(deleteCar.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(deleteCar.fulfilled, (state, action: PayloadAction<string>) => {
+        state.status = 'succeeded';
+        state.cars = state.cars.filter((car) => car._id !== action.payload);
+      })
+      .addCase(deleteCar.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload || 'Failed to delete car';
       });
   },
 });

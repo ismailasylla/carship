@@ -3,6 +3,9 @@ import { getCars, createCar, updateCar, deleteCar, getFilterOptions, getCarById 
 
 const router = express.Router();
 
+router.route('/filters')
+  .get(getFilterOptions);
+
 router.route('/')
   .get(getCars)
   .post(createCar);
@@ -11,8 +14,5 @@ router.route('/:id')
   .get(getCarById)
   .put(updateCar)
   .delete(deleteCar);
-
-router.route('/filters')
-  .get(getFilterOptions);
 
 export default router;

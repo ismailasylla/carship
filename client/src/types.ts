@@ -1,5 +1,4 @@
 export interface Car {
-  imageUrl: string;
   _id: string;
   make: string;
   model: string;
@@ -9,6 +8,7 @@ export interface Car {
   shippingStatus: string;
   createdAt: string;
   updatedAt: string;
-  __v: number;
+  imageUrl: string;
   vin: string;
+  __v: number;
 }

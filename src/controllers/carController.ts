@@ -8,23 +8,29 @@ export const getCars = async (req: Request, res: Response) => {
   const { page = 1, limit = 8, make, model, year, minPrice, maxPrice, shippingStatus } = req.query;
 
   let filter: any = {};
+
+  // Add filters based on query parameters
   if (make) filter.make = make;
   if (model) filter.model = model;
-  if (year) filter.year = parseInt(year as string);
+  if (year) filter.year = parseInt(year as string, 10); // Ensure year is parsed as an integer
   if (minPrice) filter.price = { ...filter.price, $gte: parseFloat(minPrice as string) };
   if (maxPrice) filter.price = { ...filter.price, $lte: parseFloat(maxPrice as string) };
   if (shippingStatus) filter.shippingStatus = shippingStatus;
 
   try {
+    // Fetch the cars with the specified filters, pagination, and limit
     const cars = await Car.find(filter)
       .skip((+page - 1) * +limit)
       .limit(+limit);
 
+    // Count the total number of documents matching the filter
     const totalCars = await Car.countDocuments(filter);
     const totalPages = Math.ceil(totalCars / +limit);
 
+    // Send the response with cars and total pages
     res.status(200).json({ cars, totalPages });
   } catch (error) {
+    // Handle and log errors
     console.error('Error fetching cars:', error);
     res.status(500).json({ message: 'Server error', error: (error as Error).message });
   }
@@ -32,8 +38,6 @@ export const getCars = async (req: Request, res: Response) => {
 
 // Get filter options for cars (make, model, year)
 export const getFilterOptions = async (req: Request, res: Response) => {
-  console.log('Request query:', req.query); // Log query parameters
-
   try {
     const makes = await Car.distinct('make');
     const models = await Car.distinct('model');

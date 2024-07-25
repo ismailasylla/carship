@@ -94,6 +94,7 @@ const AddCarForm: React.FC = () => {
       createdAt: "",
       updatedAt: "",
       __v: 0,
+      imageUrl: "",
     };
 
     try {

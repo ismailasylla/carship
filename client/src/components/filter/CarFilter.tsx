@@ -18,8 +18,9 @@ const CarFilter: React.FC = () => {
   }, [dispatch]);
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    dispatch(setFilters({ [e.target.name]: e.target.value }));
-    dispatch(fetchCars({ page: 1 }));
+    const newFilters = { ...filters, [e.target.name]: e.target.value };
+    dispatch(setFilters(newFilters));
+    dispatch(fetchCars({ page: 1, ...newFilters }));
   };
 
   return (
@@ -36,7 +37,7 @@ const CarFilter: React.FC = () => {
           <select
             id="model"
             name="model"
-            value={filters.model}
+            value={filters.model || ""}
             onChange={handleFilterChange}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
           >
@@ -44,28 +45,6 @@ const CarFilter: React.FC = () => {
             {filterOptions.models.map((model) => (
               <option key={model} value={model}>
                 {model}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label
-            htmlFor="year"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Year
-          </label>
-          <select
-            id="year"
-            name="year"
-            value={filters.year}
-            onChange={handleFilterChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
-          >
-            <option value="">All Years</option>
-            {filterOptions.years.map((year) => (
-              <option key={year} value={year}>
-                {year}
               </option>
             ))}
           </select>
@@ -80,7 +59,7 @@ const CarFilter: React.FC = () => {
           <select
             id="make"
             name="make"
-            value={filters.make}
+            value={filters.make || ""}
             onChange={handleFilterChange}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
           >
@@ -92,9 +71,30 @@ const CarFilter: React.FC = () => {
             ))}
           </select>
         </div>
+        <div>
+          <label
+            htmlFor="year"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Year
+          </label>
+          <select
+            id="year"
+            name="year"
+            value={filters.year || ""}
+            onChange={handleFilterChange}
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
+          >
+            <option value="">All Years</option>
+            {filterOptions.years.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
-      {status === "loading" && <p>Loading filter options...</p>}
-      {status === "failed" && <p>Error loading filter options</p>}
+      {status === "loading" && <p>Loading...</p>}
     </div>
   );
 };

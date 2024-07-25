@@ -2,13 +2,13 @@ import axios from 'axios';
 import { Car } from '../types';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5001',
+  baseURL: 'http://localhost:5001/api',
+  headers: { 'Content-Type': 'application/json' },
 });
 
 const cache = new Map<string, any>();
 const CACHE_DURATION = 300000; // 5 minutes
 
-// Fetch cars with pagination and filters
 export const fetchCars = async (
   page: number,
   model: string,
@@ -24,7 +24,7 @@ export const fetchCars = async (
   }
 
   try {
-    const response = await api.get('/api/cars', { params: { page, model, year, make } });
+    const response = await api.get('/cars', { params: { page, model, year, make } });
     console.log('Fetched data from API:', response.data);
 
     const carsData = response.data.cars;
@@ -38,10 +38,9 @@ export const fetchCars = async (
   }
 };
 
-// Add a new car
 export const addCarRequest = async (car: Car) => {
   try {
-    const response = await api.post('/api/cars', car);
+    const response = await api.post('/cars', car);
     return response.data;
   } catch (error) {
     console.error('Error adding car:', error);
@@ -49,10 +48,9 @@ export const addCarRequest = async (car: Car) => {
   }
 };
 
-// Update car details
 export const updateCarRequest = async (car: Car) => {
   try {
-    const response = await api.put(`/api/cars/${car._id}`, car);
+    const response = await api.put(`/cars/${car._id}`, car);
     return response.data;
   } catch (error) {
     console.error('Error updating car:', error);
@@ -60,20 +58,18 @@ export const updateCarRequest = async (car: Car) => {
   }
 };
 
-// Delete a car
 export const deleteCarRequest = async (_id: string) => {
   try {
-    await api.delete(`/api/cars/${_id}`);
+    await api.delete(`/cars/${_id}`);
   } catch (error) {
     console.error('Error deleting car:', error);
     throw error;
   }
 };
 
-// Fetch filter options (models, makes, years)
-export const fetchFilterOptions = async () => {
+export const fetchFilterOptions = async (): Promise<{ models: string[], makes: string[], years: string[] }> => {
   try {
-    const response = await axios.get('/api/cars/filters');
+    const response = await api.get('/cars/filters');
     return response.data;
   } catch (error) {
     console.error('Error fetching filter options:', error);
@@ -81,10 +77,9 @@ export const fetchFilterOptions = async () => {
   }
 };
 
-// Fetch a single car by ID
 export const fetchCarRequest = async (id: string): Promise<Car> => {
   try {
-    const response = await api.get(`/api/cars/${id}`);
+    const response = await api.get(`/cars/${id}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching car:', error);
