@@ -11,7 +11,6 @@ const HomePage: React.FC = () => {
   const { cars, status, error } = useSelector((state: RootState) => state.car);
 
   useEffect(() => {
-    // Example parameters, replace with actual values or logic as needed
     const page = 1;
     const model = "";
     const year = "";
@@ -38,7 +37,6 @@ const HomePage: React.FC = () => {
     socket.on("carUpdated", handleCarUpdate);
     socket.on("carAdded", handleCarAdd);
 
-    // Clean up WebSocket listeners on component unmount
     return () => {
       socket.off("carUpdated", handleCarUpdate);
       socket.off("carAdded", handleCarAdd);

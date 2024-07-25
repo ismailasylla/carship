@@ -1,9 +1,14 @@
-import axios from 'axios';
-import { Car } from '../types';
+import api from './api';
 
-const api = axios.create({
-  baseURL: 'http://localhost:5001/api',
-  headers: { 'Content-Type': 'application/json' },
+// interceptor to include the token
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  return config;
+}, (error) => {
+  return Promise.reject(error);
 });
 
 const cache = new Map<string, any>();
@@ -14,7 +19,7 @@ export const fetchCars = async (
   model: string,
   year: string,
   make: string
-): Promise<{ cars: Car[], totalPages: number }> => {
+): Promise<{ cars: any[], totalPages: number }> => {
   const cacheKey = `cars_page_${page}_${model}_${year}_${make}`;
   console.log('Fetching cars with cacheKey:', cacheKey);
 
@@ -38,7 +43,7 @@ export const fetchCars = async (
   }
 };
 
-export const addCarRequest = async (car: Car) => {
+export const addCarRequest = async (car: any) => {
   try {
     const response = await api.post('/cars', car);
     return response.data;
@@ -48,7 +53,7 @@ export const addCarRequest = async (car: Car) => {
   }
 };
 
-export const updateCarRequest = async (car: Car) => {
+export const updateCarRequest = async (car: any) => {
   try {
     const response = await api.put(`/cars/${car._id}`, car);
     return response.data;
@@ -77,7 +82,7 @@ export const fetchFilterOptions = async (): Promise<{ models: string[], makes: s
   }
 };
 
-export const fetchCarRequest = async (id: string): Promise<Car> => {
+export const fetchCarRequest = async (id: string): Promise<any> => {
   try {
     const response = await api.get(`/cars/${id}`);
     return response.data;
