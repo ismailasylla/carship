@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../store";
 import { addCar } from "../store/slices/carSlice";
@@ -8,9 +8,46 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { BackButton, Button } from "./buttons";
 import socket from "../socket/websocket";
+import { Formik, Field, Form, ErrorMessage } from "formik";
+import * as Yup from "yup";
+
+const validationSchema = Yup.object({
+  make: Yup.string()
+    .trim()
+    .min(2, "Make must be at least 2 characters")
+    .matches(/^[a-zA-Z\s]+$/, "Make should only contain letters and spaces")
+    .required("Make is required"),
+  model: Yup.string()
+    .trim()
+    .min(2, "Model must be at least 2 characters")
+    .matches(
+      /^[a-zA-Z0-9\s]+$/,
+      "Model should only contain letters, numbers, and spaces"
+    )
+    .required("Model is required"),
+  year: Yup.number()
+    .integer("Year must be an integer")
+    .min(1886, "Year must be between 1886 and the current year")
+    .max(
+      new Date().getFullYear(),
+      "Year must be between 1886 and the current year"
+    )
+    .required("Year is required"),
+  price: Yup.number()
+    .positive("Price must be a positive number")
+    .max(1_000_000, "Price is too high")
+    .required("Price is required"),
+  vin: Yup.string()
+    .length(17, "VIN must be exactly 17 characters long")
+    .matches(/^[A-HJ-NPR-Z0-9]+$/, "VIN must exclude I, O, and Q")
+    .required("VIN is required"),
+});
 
 const AddCarForm: React.FC = () => {
-  const [form, setForm] = useState<{
+  const dispatch: AppDispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (values: {
     make: string;
     model: string;
     year: number;
@@ -18,80 +55,16 @@ const AddCarForm: React.FC = () => {
     price: number;
     shippingStatus: string;
     vin: string;
-  }>({
-    make: "",
-    model: "",
-    year: 0,
-    currency: "AED",
-    price: 0,
-    shippingStatus: "Pending",
-    vin: "",
-  });
-
-  const [errors, setErrors] = useState<{
-    make?: string;
-    model?: string;
-    year?: string;
-    price?: string;
-    vin?: string;
-  }>({});
-
-  const dispatch: AppDispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const validateForm = () => {
-    let valid = true;
-    let errors: any = {};
-
-    if (!form.make) {
-      errors.make = "Make is required";
-      valid = false;
-    }
-    if (!form.model) {
-      errors.model = "Model is required";
-      valid = false;
-    }
-    if (form.year <= 0 || form.year > new Date().getFullYear()) {
-      errors.year = "Year must be a valid year";
-      valid = false;
-    }
-    if (form.price <= 0) {
-      errors.price = "Price must be a positive number";
-      valid = false;
-    }
-    if (!form.vin) {
-      errors.vin = "VIN is required";
-      valid = false;
-    }
-
-    setErrors(errors);
-    return valid;
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setForm((prevForm) => ({
-      ...prevForm,
-      [name]: name === "year" || name === "price" ? parseFloat(value) : value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) return;
-
+  }) => {
     const carData: Car = {
       _id: "",
-      make: form.make,
-      model: form.model,
-      year: form.year,
-      currency: form.currency,
-      price: form.price,
-      shippingStatus: form.shippingStatus,
-      vin: form.vin,
+      make: values.make,
+      model: values.model,
+      year: values.year,
+      currency: values.currency,
+      price: values.price,
+      shippingStatus: values.shippingStatus,
+      vin: values.vin,
       createdAt: "",
       updatedAt: "",
       __v: 0,
@@ -122,128 +95,138 @@ const AddCarForm: React.FC = () => {
           Add New Car
         </h1>
         <div className="mt-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="make" className="block text-gray-600 mb-1">
-                Make
-              </label>
-              <input
-                name="make"
-                value={form.make}
-                onChange={handleChange}
-                placeholder="Make"
-                required
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              {errors.make && (
-                <p className="text-red-500 text-sm">{errors.make}</p>
-              )}
-            </div>
-            <div>
-              <label htmlFor="model" className="block text-gray-600 mb-1">
-                Model
-              </label>
-              <input
-                name="model"
-                value={form.model}
-                onChange={handleChange}
-                placeholder="Model"
-                required
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              {errors.model && (
-                <p className="text-red-500 text-sm">{errors.model}</p>
-              )}
-            </div>
-            <div>
-              <label htmlFor="year" className="block text-gray-600 mb-1">
-                Year
-              </label>
-              <input
-                name="year"
-                value={form.year}
-                onChange={handleChange}
-                placeholder="Year"
-                type="number"
-                required
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              {errors.year && (
-                <p className="text-red-500 text-sm">{errors.year}</p>
-              )}
-            </div>
-            <div>
-              <label htmlFor="currency" className="block text-gray-600 mb-1">
-                Currency
-              </label>
-              <select
-                name="currency"
-                value={form.currency}
-                onChange={handleChange}
-                required
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="AED">AED</option>
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-                <option value="GBP">GBP</option>
-              </select>
-            </div>
-            <div>
-              <label htmlFor="price" className="block text-gray-600 mb-1">
-                Price
-              </label>
-              <input
-                name="price"
-                value={form.price}
-                onChange={handleChange}
-                placeholder="Price"
-                type="number"
-                required
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              {errors.price && (
-                <p className="text-red-500 text-sm">{errors.price}</p>
-              )}
-            </div>
-            <div>
-              <label htmlFor="vin" className="block text-gray-600 mb-1">
-                VIN
-              </label>
-              <input
-                name="vin"
-                value={form.vin}
-                onChange={handleChange}
-                placeholder="VIN"
-                required
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              {errors.vin && (
-                <p className="text-red-500 text-sm">{errors.vin}</p>
-              )}
-            </div>
-            <div>
-              <label
-                htmlFor="shippingStatus"
-                className="block text-gray-600 mb-1"
-              >
-                Shipping Status
-              </label>
-              <select
-                name="shippingStatus"
-                value={form.shippingStatus}
-                onChange={handleChange}
-                required
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="Pending">Pending</option>
-                <option value="Shipped">Shipped</option>
-                <option value="Delivered">Delivered</option>
-                <option value="Cancelled">Cancelled</option>
-              </select>
-            </div>
-            <Button>Add Car</Button>
-          </form>
+          <Formik
+            initialValues={{
+              make: "",
+              model: "",
+              year: 0,
+              currency: "AED",
+              price: 0,
+              shippingStatus: "Pending",
+              vin: "",
+            }}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+          >
+            {({ setFieldValue }) => (
+              <Form className="space-y-4">
+                <div>
+                  <label htmlFor="make" className="block text-gray-600 mb-1">
+                    Make
+                  </label>
+                  <Field
+                    name="make"
+                    placeholder="Make"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <ErrorMessage
+                    name="make"
+                    component="p"
+                    className="text-red-500 text-sm"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="model" className="block text-gray-600 mb-1">
+                    Model
+                  </label>
+                  <Field
+                    name="model"
+                    placeholder="Model"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <ErrorMessage
+                    name="model"
+                    component="p"
+                    className="text-red-500 text-sm"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="year" className="block text-gray-600 mb-1">
+                    Year
+                  </label>
+                  <Field
+                    name="year"
+                    type="number"
+                    placeholder="Year"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <ErrorMessage
+                    name="year"
+                    component="p"
+                    className="text-red-500 text-sm"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="currency"
+                    className="block text-gray-600 mb-1"
+                  >
+                    Currency
+                  </label>
+                  <Field
+                    as="select"
+                    name="currency"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="AED">AED</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="GBP">GBP</option>
+                  </Field>
+                </div>
+                <div>
+                  <label htmlFor="price" className="block text-gray-600 mb-1">
+                    Price
+                  </label>
+                  <Field
+                    name="price"
+                    type="number"
+                    placeholder="Price"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <ErrorMessage
+                    name="price"
+                    component="p"
+                    className="text-red-500 text-sm"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="vin" className="block text-gray-600 mb-1">
+                    VIN
+                  </label>
+                  <Field
+                    name="vin"
+                    placeholder="VIN"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <ErrorMessage
+                    name="vin"
+                    component="p"
+                    className="text-red-500 text-sm"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="shippingStatus"
+                    className="block text-gray-600 mb-1"
+                  >
+                    Shipping Status
+                  </label>
+                  <Field
+                    as="select"
+                    name="shippingStatus"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </Field>
+                </div>
+                <Button type="submit">Add Car</Button>
+              </Form>
+            )}
+          </Formik>
         </div>
         <ToastContainer />
       </div>
