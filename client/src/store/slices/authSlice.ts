@@ -37,7 +37,6 @@ export const loginUser = createAsyncThunk<
       const response = await axios.post('/auth/login', { email, password });
       const { token, user } = response.data;
 
-      // Save token in localStorage
       localStorage.setItem('token', token);
 
       return { user, token };
@@ -59,7 +58,6 @@ export const registerUser = createAsyncThunk<
       const response = await axios.post('/auth/register', { email, password });
       const { token, user } = response.data;
 
-      // Save token in localStorage
       localStorage.setItem('token', token);
 
       return { user, token };
@@ -81,7 +79,6 @@ const authSlice = createSlice({
       state.error = null;
       state.token = null;
 
-      // Remove token from localStorage
       localStorage.removeItem('token');
     },
   },
@@ -98,7 +95,6 @@ const authSlice = createSlice({
         state.error = null;
         state.token = action.payload.token;
 
-        // Save token in localStorage
         localStorage.setItem('token', action.payload.token);
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -116,7 +112,6 @@ const authSlice = createSlice({
         state.error = null;
         state.token = action.payload.token;
 
-        // Save token in localStorage
         localStorage.setItem('token', action.payload.token);
       })
       .addCase(registerUser.rejected, (state, action) => {

@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import User from '../models/userModel';
 import mongoose from 'mongoose';
+import User from '../models/userModel';
 import { IUser } from '../interfaces/user';
 
 export const registerUser = async (req: Request, res: Response) => {
@@ -42,7 +42,7 @@ export const loginUser = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    const isMatch = await user.comparePassword(password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
