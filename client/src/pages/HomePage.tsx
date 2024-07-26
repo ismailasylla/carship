@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../store";
 import { fetchCars, updateCars, addCar } from "../store/slices/carSlice";
 import CarList from "../components/CarList";
-import socket from "../utils/websocket";
+import socket from "../socket/websocket";
 import { Car } from "../types";
 
 const HomePage: React.FC = () => {
