@@ -68,8 +68,9 @@ const LoginPage: React.FC = () => {
           <p className="text-center text-red-500 mt-4">{authState.error}</p>
         )}
         <div className="mt-4 text-center">
+          Don't have an account?{" "}
           <Link to="/register" className="text-blue-500 hover:underline">
-            Don't have an account? Register here.
+            Register here.
           </Link>
         </div>
       </div>
