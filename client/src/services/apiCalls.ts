@@ -1,7 +1,7 @@
-import api from './api';
+import axiosInstance from "../config/axiosConfig";
 
 // interceptor to include the token
-api.interceptors.request.use((config) => {
+axiosInstance.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers['Authorization'] = `Bearer ${token}`;
@@ -29,7 +29,7 @@ export const fetchCars = async (
   }
 
   try {
-    const response = await api.get('/cars', { params: { page, model, year, make } });
+    const response = await axiosInstance.get('/cars', { params: { page, model, year, make } });
     console.log('Fetched data from API:', response.data);
 
     const carsData = response.data.cars;
@@ -45,7 +45,7 @@ export const fetchCars = async (
 
 export const addCarRequest = async (car: any) => {
   try {
-    const response = await api.post('/cars', car);
+    const response = await axiosInstance.post('/cars', car);
     return response.data;
   } catch (error) {
     console.error('Error adding car:', error);
@@ -55,7 +55,7 @@ export const addCarRequest = async (car: any) => {
 
 export const updateCarRequest = async (car: any) => {
   try {
-    const response = await api.put(`/cars/${car._id}`, car);
+    const response = await axiosInstance.put(`/cars/${car._id}`, car);
     return response.data;
   } catch (error) {
     console.error('Error updating car:', error);
@@ -65,7 +65,7 @@ export const updateCarRequest = async (car: any) => {
 
 export const deleteCarRequest = async (_id: string) => {
   try {
-    await api.delete(`/cars/${_id}`);
+    await axiosInstance.delete(`/cars/${_id}`);
   } catch (error) {
     console.error('Error deleting car:', error);
     throw error;
@@ -74,7 +74,7 @@ export const deleteCarRequest = async (_id: string) => {
 
 export const fetchFilterOptions = async (): Promise<{ models: string[], makes: string[], years: string[] }> => {
   try {
-    const response = await api.get('/cars/filters');
+    const response = await axiosInstance.get('/cars/filters');
     return response.data;
   } catch (error) {
     console.error('Error fetching filter options:', error);
@@ -84,7 +84,7 @@ export const fetchFilterOptions = async (): Promise<{ models: string[], makes: s
 
 export const fetchCarRequest = async (id: string): Promise<any> => {
   try {
-    const response = await api.get(`/cars/${id}`);
+    const response = await axiosInstance.get(`/cars/${id}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching car:', error);
