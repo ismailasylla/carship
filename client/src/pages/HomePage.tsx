@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../store";
 import { fetchCars, updateCars, addCar } from "../store/slices/carSlice";
@@ -10,29 +10,39 @@ const HomePage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const { cars, status, error } = useSelector((state: RootState) => state.car);
 
-  useEffect(() => {
-    const page = 1;
-    const model = "";
-    const year = "";
-    const make = "";
+  const initialParams = useMemo(
+    () => ({
+      page: 1,
+      model: "",
+      year: "",
+      make: "",
+    }),
+    []
+  );
 
+  const handleCarUpdate = useCallback(
+    (updatedCars: Car[]) => {
+      dispatch(updateCars(updatedCars));
+    },
+    [dispatch]
+  );
+
+  const handleCarAdd = useCallback(
+    (newCar: Car) => {
+      dispatch(addCar(newCar));
+    },
+    [dispatch]
+  );
+
+  useEffect(() => {
     // Fetch cars
-    dispatch(fetchCars({ page, model, year, make })).then((action) => {
+    dispatch(fetchCars(initialParams)).then((action) => {
       if (fetchCars.fulfilled.match(action)) {
         console.log("Fetched cars:", action.payload);
       } else {
         console.error("Failed to fetch cars");
       }
     });
-
-    // Handle WebSocket events
-    const handleCarUpdate = (updatedCars: Car[]) => {
-      dispatch(updateCars(updatedCars));
-    };
-
-    const handleCarAdd = (newCar: Car) => {
-      dispatch(addCar(newCar));
-    };
 
     socket.on("carUpdated", handleCarUpdate);
     socket.on("carAdded", handleCarAdd);
@@ -41,7 +51,7 @@ const HomePage: React.FC = () => {
       socket.off("carUpdated", handleCarUpdate);
       socket.off("carAdded", handleCarAdd);
     };
-  }, [dispatch]);
+  }, [dispatch, initialParams, handleCarUpdate, handleCarAdd]);
 
   return (
     <div className="container mx-auto p-6">
