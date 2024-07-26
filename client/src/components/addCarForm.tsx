@@ -6,7 +6,7 @@ import { Car } from "../types";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
-import { BackButton } from "./buttons";
+import { BackButton, Button } from "./buttons";
 import socket from "../socket/websocket";
 
 const AddCarForm: React.FC = () => {
@@ -242,12 +242,7 @@ const AddCarForm: React.FC = () => {
                 <option value="Cancelled">Cancelled</option>
               </select>
             </div>
-            <button
-              type="submit"
-              className="w-full py-2 bg-customGray text-white font-semibold rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              Add Car
-            </button>
+            <Button>Add Car</Button>
           </form>
         </div>
         <ToastContainer />

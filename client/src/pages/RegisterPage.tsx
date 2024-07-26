@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../store";
 import { registerUser } from "../store/slices/authSlice";
 import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom"; // Import Link
+import { Link } from "react-router-dom";
 
 const RegisterPage: React.FC = () => {
   const [email, setEmail] = useState("");

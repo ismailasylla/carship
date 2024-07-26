@@ -58,7 +58,7 @@ const CarListPage: React.FC = () => {
     dispatch(updateCars(updatedCars));
   });
 
-  // Debugging state I WILL REMOVE LATER
+  // Debugging state (Remove this in production)
   useEffect(() => {
     console.log("Current cars in CarListPage:", cars);
   }, [cars]);

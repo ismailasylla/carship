@@ -49,7 +49,9 @@ const CarDetailPage: React.FC = () => {
       try {
         await dispatch(updateCar(form)).unwrap();
         toast.success("Car details updated successfully!");
-        setTimeout(() => navigate("/"), 2000);
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 2000);
       } catch (error) {
         toast.error("Failed to update car. Please try again.");
       }
