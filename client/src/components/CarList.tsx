@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../store";
 import {
@@ -24,7 +24,6 @@ const CarListPage: React.FC = () => {
   );
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
-  // Custom hook to manage local storage
   const [storedFilters, setStoredFilters] = useLocalStorage(
     "carFilters",
     filters
@@ -40,16 +39,21 @@ const CarListPage: React.FC = () => {
     dispatch(fetchCars({ page: currentPage, ...storedFilters }));
   }, [dispatch, currentPage, storedFilters]);
 
-  const handlePageChange = (page: number) => {
-    dispatch(setPage(page));
-    dispatch(fetchCars({ page, ...storedFilters }));
-  };
+  const handlePageChange = useCallback(
+    (page: number) => {
+      dispatch(setPage(page));
+      dispatch(fetchCars({ page, ...storedFilters }));
+    },
+    [dispatch, storedFilters]
+  );
 
-  const handleEdit = (carId: string) => {
-    navigate(`/car/${carId}`);
-  };
+  const handleEdit = useCallback(
+    (carId: string) => {
+      navigate(`/car/${carId}`);
+    },
+    [navigate]
+  );
 
-  // listen for WebSocket events
   useSocket("updateCars", (updatedCars: Car[]) => {
     dispatch(updateCars(updatedCars));
   });

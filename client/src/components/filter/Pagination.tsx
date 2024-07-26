@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 
 interface PaginationProps {
   currentPage: number;
@@ -11,16 +11,25 @@ const Pagination: React.FC<PaginationProps> = ({
   totalPages,
   onPageChange,
 }) => {
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  const pages = useMemo(
+    () => Array.from({ length: totalPages }, (_, i) => i + 1),
+    [totalPages]
+  );
+
+  const handlePageChange = useCallback(
+    (page: number) => {
+      onPageChange(page);
+    },
+    [onPageChange]
+  );
 
   return (
     <div className="flex flex-col items-center mt-6">
-      {/* Mobile View */}
       <nav aria-label="Page navigation" className="block sm:hidden">
         <ul className="flex items-center -space-x-px h-8 text-sm">
           <li>
             <button
-              onClick={() => onPageChange(currentPage - 1)}
+              onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
               className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white disabled:opacity-50"
             >
@@ -45,7 +54,7 @@ const Pagination: React.FC<PaginationProps> = ({
           {pages.map((page) => (
             <li key={page}>
               <button
-                onClick={() => onPageChange(page)}
+                onClick={() => handlePageChange(page)}
                 aria-current={page === currentPage ? "page" : undefined}
                 className={`flex items-center justify-center px-3 h-8 leading-tight ${
                   page === currentPage
@@ -59,7 +68,7 @@ const Pagination: React.FC<PaginationProps> = ({
           ))}
           <li>
             <button
-              onClick={() => onPageChange(currentPage + 1)}
+              onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
               className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white disabled:opacity-50"
             >
@@ -83,13 +92,11 @@ const Pagination: React.FC<PaginationProps> = ({
           </li>
         </ul>
       </nav>
-
-      {/* Desktop View */}
       <nav aria-label="Page navigation" className="hidden sm:block">
         <ul className="flex items-center -space-x-px h-10 text-base">
           <li>
             <button
-              onClick={() => onPageChange(currentPage - 1)}
+              onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
               className="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white disabled:opacity-50"
             >
@@ -114,7 +121,7 @@ const Pagination: React.FC<PaginationProps> = ({
           {pages.map((page) => (
             <li key={page}>
               <button
-                onClick={() => onPageChange(page)}
+                onClick={() => handlePageChange(page)}
                 aria-current={page === currentPage ? "page" : undefined}
                 className={`flex items-center justify-center px-4 h-10 leading-tight ${
                   page === currentPage
@@ -128,7 +135,7 @@ const Pagination: React.FC<PaginationProps> = ({
           ))}
           <li>
             <button
-              onClick={() => onPageChange(currentPage + 1)}
+              onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
               className="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white disabled:opacity-50"
             >

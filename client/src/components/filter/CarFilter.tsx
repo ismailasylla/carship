@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../store";
 import {
@@ -17,11 +17,14 @@ const CarFilter: React.FC = () => {
     dispatch(fetchFilterOptions());
   }, [dispatch]);
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newFilters = { ...filters, [e.target.name]: e.target.value };
-    dispatch(setFilters(newFilters));
-    dispatch(fetchCars({ page: 1, ...newFilters }));
-  };
+  const handleFilterChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const newFilters = { ...filters, [e.target.name]: e.target.value };
+      dispatch(setFilters(newFilters));
+      dispatch(fetchCars({ page: 1, ...newFilters }));
+    },
+    [dispatch, filters]
+  );
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md mb-6">
