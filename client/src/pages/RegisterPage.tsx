@@ -1,25 +1,31 @@
-import React, { useState } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../store";
 import { registerUser } from "../store/slices/authSlice";
 import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom"; // Import Link
+import { Link } from "react-router-dom";
+import { useFormik } from "formik";
+import { registrationSchema } from "../validation/validationSchemas";
 
 const RegisterPage: React.FC = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
   const authState = useSelector((state: RootState) => state.auth);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    dispatch(registerUser({ email, password })).then((action) => {
-      if (registerUser.fulfilled.match(action)) {
-        navigate("/");
-      }
-    });
-  };
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+      password: "",
+    },
+    validationSchema: registrationSchema,
+    onSubmit: (values) => {
+      dispatch(registerUser(values)).then((action) => {
+        if (registerUser.fulfilled.match(action)) {
+          navigate("/");
+        }
+      });
+    },
+  });
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -27,7 +33,7 @@ const RegisterPage: React.FC = () => {
         <h1 className="text-2xl font-bold mb-6 text-center text-gray-700">
           Register
         </h1>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={formik.handleSubmit}>
           <div className="mb-4">
             <label htmlFor="email" className="block text-gray-600 mb-1">
               Email
@@ -35,11 +41,19 @@ const RegisterPage: React.FC = () => {
             <input
               type="email"
               id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              name="email"
+              value={formik.values.email}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              className={`w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 ${
+                formik.touched.email && formik.errors.email
+                  ? "focus:ring-red-500"
+                  : "focus:ring-blue-500"
+              }`}
             />
+            {formik.touched.email && formik.errors.email ? (
+              <p className="text-red-500 text-sm mt-1">{formik.errors.email}</p>
+            ) : null}
           </div>
           <div className="mb-6">
             <label htmlFor="password" className="block text-gray-600 mb-1">
@@ -48,11 +62,21 @@ const RegisterPage: React.FC = () => {
             <input
               type="password"
               id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              name="password"
+              value={formik.values.password}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              className={`w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 ${
+                formik.touched.password && formik.errors.password
+                  ? "focus:ring-red-500"
+                  : "focus:ring-blue-500"
+              }`}
             />
+            {formik.touched.password && formik.errors.password ? (
+              <p className="text-red-500 text-sm mt-1">
+                {formik.errors.password}
+              </p>
+            ) : null}
           </div>
           <button
             type="submit"

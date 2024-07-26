@@ -238,10 +238,10 @@ const carSlice = createSlice({
   },
 });
 
-// listens to WebSocket messages
 socket.on('updateCars', (cars: Car[]) => {
   store.dispatch(updateCars(cars));
 });
+
 export const { updateCars, setPage, setFilters } = carSlice.actions;
 
 export default carSlice.reducer;
