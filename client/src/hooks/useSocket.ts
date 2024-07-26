@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import socket from '../utils/websocket';
+import socket from '../socket/websocket';
 
 const useSocket = (event: string, callback: (data: any) => void) => {
   useEffect(() => {

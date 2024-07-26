@@ -7,7 +7,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { BackButton } from "./buttons";
-import socket from "../utils/websocket";
+import socket from "../socket/websocket";
 
 const AddCarForm: React.FC = () => {
   const [form, setForm] = useState<{

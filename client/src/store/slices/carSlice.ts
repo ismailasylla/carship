@@ -6,10 +6,10 @@ import {
   deleteCarRequest as deleteCarAPI,
   fetchFilterOptions as fetchFilterOptionsAPI,
   fetchCarRequest as fetchCarAPI,
-} from '../../utils/apiCalls';
+} from '../../services/apiCalls';
 import { Car } from '../../types';
 import store, { RootState } from '../../store';
-import socket from '../../utils/websocket';
+import socket from '../../socket/websocket';
 
 interface CarState {
   cars: Car[];

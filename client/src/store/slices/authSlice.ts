@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import axiosInstance from '../../config/axiosConfig';
 
-axios.defaults.baseURL = 'http://localhost:5001/api';
 
 export interface AuthState {
   isAuthenticated: boolean;
@@ -34,7 +33,7 @@ export const loginUser = createAsyncThunk<
   'auth/loginUser',
   async ({ email, password }, thunkAPI) => {
     try {
-      const response = await axios.post('/auth/login', { email, password });
+      const response = await axiosInstance.post('/auth/login', { email, password });
       const { token, user } = response.data;
 
       localStorage.setItem('token', token);
@@ -55,7 +54,7 @@ export const registerUser = createAsyncThunk<
   'auth/registerUser',
   async ({ email, password }, thunkAPI) => {
     try {
-      const response = await axios.post('/auth/register', { email, password });
+      const response = await axiosInstance.post('/auth/register', { email, password });
       const { token, user } = response.data;
 
       localStorage.setItem('token', token);
