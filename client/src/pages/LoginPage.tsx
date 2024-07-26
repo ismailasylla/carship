@@ -3,17 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../store";
 import { loginUser } from "../store/slices/authSlice";
 import { useNavigate, Link } from "react-router-dom";
-import { Formik, Field, Form, ErrorMessage } from "formik";
-import * as Yup from "yup";
-
-const validationSchema = Yup.object({
-  email: Yup.string()
-    .email("Invalid email address")
-    .required("Email is required"),
-  password: Yup.string()
-    .min(6, "Password must be at least 6 characters")
-    .required("Password is required"),
-});
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import { loginSchema } from "../validation/validationSchemas";
 
 const LoginPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -39,10 +30,10 @@ const LoginPage: React.FC = () => {
         </h1>
         <Formik
           initialValues={{ email: "", password: "" }}
-          validationSchema={validationSchema}
+          validationSchema={loginSchema}
           onSubmit={handleSubmit}
         >
-          {({ isSubmitting }) => (
+          {() => (
             <Form>
               <div className="mb-4">
                 <label htmlFor="email" className="block text-gray-600 mb-1">
@@ -56,7 +47,7 @@ const LoginPage: React.FC = () => {
                 />
                 <ErrorMessage
                   name="email"
-                  component="p"
+                  component="div"
                   className="text-red-500 text-sm"
                 />
               </div>
@@ -72,13 +63,12 @@ const LoginPage: React.FC = () => {
                 />
                 <ErrorMessage
                   name="password"
-                  component="p"
+                  component="div"
                   className="text-red-500 text-sm"
                 />
               </div>
               <button
                 type="submit"
-                disabled={isSubmitting}
                 className="w-full py-2 bg-gray-800 text-white font-semibold rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 Login

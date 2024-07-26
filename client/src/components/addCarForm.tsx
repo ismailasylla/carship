@@ -5,47 +5,15 @@ import { addCar } from "../store/slices/carSlice";
 import { Car } from "../types";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { BackButton, Button } from "./buttons";
 import socket from "../socket/websocket";
 import { Formik, Field, Form, ErrorMessage } from "formik";
-import * as Yup from "yup";
-
-const validationSchema = Yup.object({
-  make: Yup.string()
-    .trim()
-    .min(2, "Make must be at least 2 characters")
-    .matches(/^[a-zA-Z\s]+$/, "Make should only contain letters and spaces")
-    .required("Make is required"),
-  model: Yup.string()
-    .trim()
-    .min(2, "Model must be at least 2 characters")
-    .matches(
-      /^[a-zA-Z0-9\s]+$/,
-      "Model should only contain letters, numbers, and spaces"
-    )
-    .required("Model is required"),
-  year: Yup.number()
-    .integer("Year must be an integer")
-    .min(1886, "Year must be between 1886 and the current year")
-    .max(
-      new Date().getFullYear(),
-      "Year must be between 1886 and the current year"
-    )
-    .required("Year is required"),
-  price: Yup.number()
-    .positive("Price must be a positive number")
-    .max(1_000_000, "Price is too high")
-    .required("Price is required"),
-  vin: Yup.string()
-    .length(17, "VIN must be exactly 17 characters long")
-    .matches(/^[A-HJ-NPR-Z0-9]+$/, "VIN must exclude I, O, and Q")
-    .required("VIN is required"),
-});
+import { carValidationSchema } from "../validation/validationSchemas";
 
 const AddCarForm: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const navigate = useNavigate();
+  // const navigate = useNavigate()
 
   const handleSubmit = async (values: {
     make: string;
@@ -78,6 +46,7 @@ const AddCarForm: React.FC = () => {
       // Emit WebSocket event
       socket.emit("carAdded", carData);
 
+      // navigate("/");
       setTimeout(() => {
         window.location.href = "/";
       }, 2000);
@@ -105,10 +74,10 @@ const AddCarForm: React.FC = () => {
               shippingStatus: "Pending",
               vin: "",
             }}
-            validationSchema={validationSchema}
+            validationSchema={carValidationSchema}
             onSubmit={handleSubmit}
           >
-            {({ setFieldValue }) => (
+            {() => (
               <Form className="space-y-4">
                 <div>
                   <label htmlFor="make" className="block text-gray-600 mb-1">
