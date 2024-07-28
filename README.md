@@ -177,7 +177,7 @@ http://localhost:5001/api
 1. **Clone the repository:**
 
    ```sh
-   git clone https://github.com/your-repo-url.git
+   git clone https://github.com/ismailasylla/carship.git
    ```
 
 2. **Navigate to the project directory:**
