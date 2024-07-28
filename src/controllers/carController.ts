@@ -4,7 +4,8 @@ import { ICar } from '../interfaces/car';
 import { ShippingStatus } from '../interfaces/enums/shippingStatus.enum';
 import { emitCarUpdate } from '../server';
 
-export const getCars = async (req: Request, res: Response) => {
+// Get cars with filters
+export const getCars = async (req: Request, res: Response): Promise<void> => {
   const { page = 1, limit = 8, make, model, year, minPrice, maxPrice, shippingStatus } = req.query;
 
   let filter: any = {};
@@ -17,29 +18,26 @@ export const getCars = async (req: Request, res: Response) => {
   if (shippingStatus) filter.shippingStatus = shippingStatus;
 
   try {
-
     const cars = await Car.find(filter)
       .skip((+page - 1) * +limit)
-      .limit(+limit)
-      
+      .limit(+limit);
+    
     const totalCars = await Car.countDocuments(filter);
     const totalPages = Math.ceil(totalCars / +limit);
 
-    // Send the response with cars and total pages
     res.status(200).json({ cars, totalPages });
   } catch (error) {
-    // Handle and log errors
     console.error('Error fetching cars:', error);
     res.status(500).json({ message: 'Server error', error: (error as Error).message });
   }
 };
 
-// Get filter options for cars (make, model, year)
-export const getFilterOptions = async (req: Request, res: Response) => {
+// Get filter options for cars
+export const getFilterOptions = async (req: Request, res: Response): Promise<void> => {
   try {
-    const makes = await Car.distinct('make');
-    const models = await Car.distinct('model');
-    const years = await Car.distinct('year');
+    const makes = await Car.distinct('make').exec();
+    const models = await Car.distinct('model').exec();
+    const years = await Car.distinct('year').exec();
 
     res.status(200).json({ makes, models, years });
   } catch (error) {
@@ -48,24 +46,25 @@ export const getFilterOptions = async (req: Request, res: Response) => {
   }
 };
 
+
 // Create a new car
-export const createCar = async (req: Request, res: Response) => {
+export const createCar = async (req: Request, res: Response): Promise<void> => {
   const { make, model, year, price, vin, currency, shippingStatus }: ICar = req.body;
 
-  // Validate the presence of required fields
   if (!make || !model || !year || !price || !vin || !currency) {
-    return res.status(400).json({ message: 'Missing required fields' });
+    res.status(400).json({ message: 'Missing required fields' });
+    return;
   }
 
-  // Validate year and price
   if (year < 1900 || year > new Date().getFullYear()) {
-    return res.status(400).json({ message: 'Invalid year' });
+    res.status(400).json({ message: 'Invalid year' });
+    return;
   }
   if (price < 0) {
-    return res.status(400).json({ message: 'Invalid price' });
+    res.status(400).json({ message: 'Invalid price' });
+    return;
   }
 
-  // Create a new car instance
   const car = new Car({
     make,
     model,
@@ -77,7 +76,6 @@ export const createCar = async (req: Request, res: Response) => {
   });
 
   try {
-    // Save the car to the database
     const savedCar = await car.save();
     const cars = await Car.find({});
     emitCarUpdate(cars);
@@ -89,7 +87,7 @@ export const createCar = async (req: Request, res: Response) => {
 };
 
 // Update a car
-export const updateCar = async (req: Request, res: Response) => {
+export const updateCar = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   const { make, model, year, price, vin, currency, shippingStatus }: ICar = req.body;
 
@@ -97,13 +95,14 @@ export const updateCar = async (req: Request, res: Response) => {
     const car = await Car.findById(id);
 
     if (!car) {
-      return res.status(404).json({ message: 'Car not found' });
+      res.status(404).json({ message: 'Car not found' });
+      return;
     }
 
     await Car.updateOne(
       { _id: id },
       { $set: { make, model, year, price, vin, currency, shippingStatus } }
-    );
+    ).exec();
 
     const updatedCar = await Car.findById(id);
     const cars = await Car.find({});
@@ -117,18 +116,19 @@ export const updateCar = async (req: Request, res: Response) => {
 };
 
 // Delete a car
-export const deleteCar = async (req: Request, res: Response) => {
+export const deleteCar = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
 
   try {
     const car = await Car.findById(id);
 
     if (!car) {
-      return res.status(404).json({ message: 'Car not found' });
+      res.status(404).json({ message: 'Car not found' });
+      return;
     }
 
-    await Car.deleteOne({ _id: id });
-    const cars = await Car.find({}); 
+    await Car.deleteOne({ _id: id }).exec();
+    const cars = await Car.find({});
     emitCarUpdate(cars);
     res.status(200).json({ message: 'Car deleted' });
   } catch (error) {
@@ -138,14 +138,15 @@ export const deleteCar = async (req: Request, res: Response) => {
 };
 
 // Fetch a single car by ID
-export const getCarById = async (req: Request, res: Response) => {
+export const getCarById = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
 
   try {
     const car = await Car.findById(id);
 
     if (!car) {
-      return res.status(404).json({ message: 'Car not found' });
+      res.status(404).json({ message: 'Car not found' });
+      return;
     }
 
     res.status(200).json(car);
