@@ -1,5 +1,5 @@
 import express from 'express';
-import { getCars, createCar, updateCar, deleteCar, getFilterOptions, getCarById } from '../controllers/carController';
+import { getCars, createCar, updateCar, deleteCar, getCarById, getFilterOptions } from '../controllers/carController';
 
 const router = express.Router();
 

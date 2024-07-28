@@ -81,7 +81,7 @@ const CarListPage: React.FC = () => {
           <p className="text-center text-red-600">Error: {error}</p>
         )}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {cars.map((car) => (
+          {cars.map((car: Car) => (
             <div key={car._id} className="bg-white p-4 shadow-lg rounded-lg">
               <div className="relative w-full h-64 md:h-48 lg:h-56 overflow-hidden rounded-lg">
                 <img
