@@ -163,8 +163,12 @@ http://localhost:5001/api
 
 ## Environment Variables
 
-- **File:** `.env`
-- **Description:** Defines the environment variables.
+- **Create a `.env` file and add your environment variables:**
+
+  ```sh
+  touch .env in the root of the project
+  ```
+
 - **Variables:**
   ```
   PORT: 5001
@@ -177,13 +181,13 @@ http://localhost:5001/api
 1. **Clone the repository:**
 
    ```sh
-   git clone https://github.com/your-repo-url.git
+   git clone https://github.com/ismailasylla/carship.git
    ```
 
 2. **Navigate to the project directory:**
 
    ```sh
-   cd your-repo-directory
+   cd in to the project
    ```
 
 3. **Install dependencies:**
@@ -192,13 +196,7 @@ http://localhost:5001/api
    npm install
    ```
 
-4. **Create a `.env` file and add your environment variables:**
-
-   ```sh
-   touch .env
-   ```
-
-5. **Start the server:**
+4. **Start the server:**
    ```sh
    npm start
    ```
