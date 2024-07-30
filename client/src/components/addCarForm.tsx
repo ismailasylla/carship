@@ -1,156 +1,206 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { Provider } from "react-redux";
-import { configureStore } from "@reduxjs/toolkit";
-import { toast } from "react-toastify";
-import carSlice from "../store/slices/carSlice";
-import "@testing-library/jest-dom";
-import userEvent from "@testing-library/user-event";
+import React from "react";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../store";
+import { addCar } from "../store/slices/carSlice";
+import { Car } from "../types";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+// import { useNavigate } from "react-router-dom";
+import { BackButton, Button } from "./buttons";
 import socket from "../socket/websocket";
-import { AddCarForm } from ".";
+import { Formik, Field, Form, ErrorMessage } from "formik";
+import { carValidationSchema } from "../validation/validationSchemas";
 
-// Mock the dispatch function
-jest.mock("react-redux", () => ({
-  ...jest.requireActual("react-redux"),
-  useDispatch: () => jest.fn(),
-}));
+const AddCarForm: React.FC = () => {
+  const dispatch: AppDispatch = useDispatch();
+  // const navigate = useNavigate()
 
-// Mock the `socket.emit` function
-jest.mock("../socket/websocket", () => ({
-  emit: jest.fn(),
-}));
+  const handleSubmit = async (values: {
+    make: string;
+    model: string;
+    year: number;
+    currency: string;
+    price: number;
+    shippingStatus: string;
+    vin: string;
+  }) => {
+    const carData: Car = {
+      _id: "",
+      make: values.make,
+      model: values.model,
+      year: values.year,
+      currency: values.currency,
+      price: values.price,
+      shippingStatus: values.shippingStatus,
+      vin: values.vin,
+      createdAt: "",
+      updatedAt: "",
+      __v: 0,
+      imageUrl: "",
+    };
 
-// Mock `react-toastify` methods
-jest.mock("react-toastify", () => ({
-  toast: {
-    success: jest.fn(),
-    error: jest.fn(),
-  },
-  ToastContainer: () => <div>ToastContainer</div>,
-}));
+    try {
+      await dispatch(addCar(carData)).unwrap();
+      toast.success("Car details added successfully!");
 
-// Create a mock store
-const store = configureStore({
-  reducer: {
-    car: carSlice,
-  },
-});
+      // Emit WebSocket event
+      socket.emit("carAdded", carData);
 
-describe("AddCarForm", () => {
-  test("renders form fields and submit button", () => {
-    render(
-      <Provider store={store}>
-        <AddCarForm />
-      </Provider>
-    );
+      // navigate("/");
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
+    } catch (error) {
+      console.error("Failed to add car:", error);
+      toast.error("Failed to add car. Please try again.");
+    }
+  };
 
-    expect(screen.getByLabelText(/make/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/model/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/year/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/currency/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/price/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/vin/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/shipping status/i)).toBeInTheDocument();
-    expect(screen.getByText(/add car/i)).toBeInTheDocument();
-  });
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 pt-20">
+      <div className="w-full max-w-lg p-8 bg-white shadow-lg rounded-lg">
+        <BackButton />
+        <h1 className="text-2xl font-bold mb-6 text-center text-gray-700">
+          Add New Car
+        </h1>
+        <div className="mt-6">
+          <Formik
+            initialValues={{
+              make: "",
+              model: "",
+              year: 0,
+              currency: "AED",
+              price: 0,
+              shippingStatus: "Pending",
+              vin: "",
+            }}
+            validationSchema={carValidationSchema}
+            onSubmit={handleSubmit}
+          >
+            {() => (
+              <Form className="space-y-4">
+                <div>
+                  <label htmlFor="make" className="block text-gray-600 mb-1">
+                    Make
+                  </label>
+                  <Field
+                    name="make"
+                    placeholder="Make"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <ErrorMessage
+                    name="make"
+                    component="p"
+                    className="text-red-500 text-sm"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="model" className="block text-gray-600 mb-1">
+                    Model
+                  </label>
+                  <Field
+                    name="model"
+                    placeholder="Model"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <ErrorMessage
+                    name="model"
+                    component="p"
+                    className="text-red-500 text-sm"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="year" className="block text-gray-600 mb-1">
+                    Year
+                  </label>
+                  <Field
+                    name="year"
+                    type="number"
+                    placeholder="Year"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <ErrorMessage
+                    name="year"
+                    component="p"
+                    className="text-red-500 text-sm"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="currency"
+                    className="block text-gray-600 mb-1"
+                  >
+                    Currency
+                  </label>
+                  <Field
+                    as="select"
+                    name="currency"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="AED">AED</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="GBP">GBP</option>
+                  </Field>
+                </div>
+                <div>
+                  <label htmlFor="price" className="block text-gray-600 mb-1">
+                    Price
+                  </label>
+                  <Field
+                    name="price"
+                    type="number"
+                    placeholder="Price"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <ErrorMessage
+                    name="price"
+                    component="p"
+                    className="text-red-500 text-sm"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="vin" className="block text-gray-600 mb-1">
+                    VIN
+                  </label>
+                  <Field
+                    name="vin"
+                    placeholder="VIN"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <ErrorMessage
+                    name="vin"
+                    component="p"
+                    className="text-red-500 text-sm"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="shippingStatus"
+                    className="block text-gray-600 mb-1"
+                  >
+                    Shipping Status
+                  </label>
+                  <Field
+                    as="select"
+                    name="shippingStatus"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </Field>
+                </div>
+                <Button type="submit">Add Car</Button>
+              </Form>
+            )}
+          </Formik>
+        </div>
+        <ToastContainer />
+      </div>
+    </div>
+  );
+};
 
-  test("displays validation errors", async () => {
-    render(
-      <Provider store={store}>
-        <AddCarForm />
-      </Provider>
-    );
-
-    userEvent.click(screen.getByText(/add car/i));
-
-    await waitFor(() => {
-      expect(screen.getByText(/make is a required field/i)).toBeInTheDocument();
-      expect(
-        screen.getByText(/model is a required field/i)
-      ).toBeInTheDocument();
-      expect(screen.getByText(/year is a required field/i)).toBeInTheDocument();
-      expect(
-        screen.getByText(/price is a required field/i)
-      ).toBeInTheDocument();
-      expect(screen.getByText(/vin is a required field/i)).toBeInTheDocument();
-    });
-  });
-
-  test("submits form and handles success", async () => {
-    const dispatch = jest.fn();
-    const emit = jest.spyOn(socket, "emit");
-
-    render(
-      <Provider store={store}>
-        <AddCarForm />
-      </Provider>
-    );
-
-    userEvent.type(screen.getByLabelText(/make/i), "Toyota");
-    userEvent.type(screen.getByLabelText(/model/i), "Corolla");
-    userEvent.type(screen.getByLabelText(/year/i), "2022");
-    userEvent.type(screen.getByLabelText(/price/i), "20000");
-    userEvent.type(screen.getByLabelText(/vin/i), "XYZ123");
-
-    userEvent.selectOptions(screen.getByLabelText(/currency/i), "USD");
-    userEvent.selectOptions(
-      screen.getByLabelText(/shipping status/i),
-      "Shipped"
-    );
-
-    userEvent.click(screen.getByText(/add car/i));
-
-    await waitFor(() => {
-      expect(dispatch).toHaveBeenCalled();
-      expect(emit).toHaveBeenCalledWith("carAdded", {
-        _id: "",
-        make: "Toyota",
-        model: "Corolla",
-        year: 2022,
-        currency: "USD",
-        price: 20000,
-        shippingStatus: "Shipped",
-        vin: "XYZ123",
-        createdAt: "",
-        updatedAt: "",
-        __v: 0,
-        imageUrl: "",
-      });
-      expect(toast.success).toHaveBeenCalledWith(
-        "Car details added successfully!"
-      );
-    });
-  });
-
-  test("handles error on form submission", async () => {
-    const dispatch = jest
-      .fn()
-      .mockRejectedValue(new Error("Failed to add car"));
-
-    render(
-      <Provider store={store}>
-        <AddCarForm />
-      </Provider>
-    );
-
-    userEvent.type(screen.getByLabelText(/make/i), "Toyota");
-    userEvent.type(screen.getByLabelText(/model/i), "Corolla");
-    userEvent.type(screen.getByLabelText(/year/i), "2022");
-    userEvent.type(screen.getByLabelText(/price/i), "20000");
-    userEvent.type(screen.getByLabelText(/vin/i), "XYZ123");
-
-    userEvent.selectOptions(screen.getByLabelText(/currency/i), "USD");
-    userEvent.selectOptions(
-      screen.getByLabelText(/shipping status/i),
-      "Shipped"
-    );
-
-    userEvent.click(screen.getByText(/add car/i));
-
-    await waitFor(() => {
-      expect(dispatch).toHaveBeenCalled();
-      expect(toast.error).toHaveBeenCalledWith(
-        "Failed to add car. Please try again."
-      );
-    });
-  });
-});
+export default AddCarForm;
