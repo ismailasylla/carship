@@ -1,11 +1,19 @@
 {
-  "files": [],
-  "references": [
-    {
-      "path": "./tsconfig.app.json"
-    },
-    {
-      "path": "./tsconfig.node.json"
+  "compilerOptions": {
+    "target": "ESNext", 
+    "module": "ESNext",
+    "moduleResolution": "bundler", 
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true, 
+    "strict": true, 
+    "noEmit": true, 
+    "esModuleInterop": true, 
+    "jsx": "react-jsx",
+    "baseUrl": "./src", 
+    "paths": {
+      "*": ["node_modules/*"]
     }
-  ]
+  },
+  "include": ["src/**/*"], 
+  "exclude": ["node_modules", "dist"]
 }

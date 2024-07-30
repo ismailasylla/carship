@@ -1,5 +1,19 @@
 # dependencies
-node_modules
+node_modules/
+
+# Environment variables
 .env*.local
 .env
+
+# Readme
 Documentation.md
+
+# Coverage directory
+coverage/
+
+# Build artifacts
+dist/
+build/
+
+# Logs
+*.log
