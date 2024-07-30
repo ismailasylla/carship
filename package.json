@@ -10,7 +10,12 @@
     "lint": "npm --prefix ./client run lint",
     "preview": "npm --prefix ./client run preview",
     "test": "jest",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "docker:build:server": "docker build -f Dockerfile.server -t carship-server .",
+    "docker:build:client": "docker build -f client/Dockerfile -t carship-client ./client",
+    "docker:up": "docker-compose up --build",
+    "docker:down": "docker-compose down",
+    "docker:restart": "npm run docker:down && npm run docker:up"
   },
   "keywords": [],
   "author": "",

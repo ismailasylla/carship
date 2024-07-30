@@ -35,7 +35,6 @@ const HomePage: React.FC = () => {
   );
 
   useEffect(() => {
-    // Fetch cars
     dispatch(fetchCars(initialParams)).then((action) => {
       if (fetchCars.fulfilled.match(action)) {
         console.log("Fetched cars:", action.payload);

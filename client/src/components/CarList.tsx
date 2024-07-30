@@ -9,17 +9,21 @@ import {
 } from "../store/slices/carSlice";
 import useSocket from "../hooks/useSocket";
 import placeholderImg from "../assets/placeholder.jpg";
-import { Button } from "./buttons";
-import Pagination from "./filter/Pagination";
-import CarFilter from "./filter/CarFilter";
+import { Button } from "../components/buttons";
+import Pagination from "../components/filter/Pagination";
+import CarFilter from "../components/filter/CarFilter";
 import { Link, useNavigate } from "react-router-dom";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { Car } from "../types";
 
-const CarListPage: React.FC = () => {
+interface CarListProps {
+  cars: Car[];
+}
+
+const CarListPage: React.FC<CarListProps> = ({ cars }) => {
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
-  const { cars, status, error, currentPage, totalPages, filters } = useSelector(
+  const { status, error, currentPage, totalPages, filters } = useSelector(
     (state: RootState) => state.car
   );
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -58,7 +62,7 @@ const CarListPage: React.FC = () => {
     dispatch(updateCars(updatedCars));
   });
 
-  // Debugging state (Remove this in production)
+  // Debugging state ( I will remove this in production)
   useEffect(() => {
     console.log("Current cars in CarListPage:", cars);
   }, [cars]);
