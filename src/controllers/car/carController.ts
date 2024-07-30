@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import Car from '../models/carModel';
-import { ICar } from '../interfaces/car';
-import { ShippingStatus } from '../interfaces/enums/shippingStatus.enum';
-import { emitCarUpdate } from '../server';
+import Car from '../../schemas/carModel';
+import { ICar } from '../../interfaces/car';
+import { emitCarUpdate } from '../../server';
+import { ShippingStatus } from '../../interfaces/enums/shippingStatus.enum';
 
 // Get cars with filters
 export const getCars = async (req: Request, res: Response): Promise<void> => {

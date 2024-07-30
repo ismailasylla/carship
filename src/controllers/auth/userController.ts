@@ -2,8 +2,9 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
-import User from '../models/userModel';
-import { IUser } from '../interfaces/user';
+import User from '../../schemas/userModel';
+import { IUser } from '../../interfaces/user';
+
 
 export const registerUser = async (req: Request, res: Response) => {
   const { email, password } = req.body;

@@ -1,7 +1,7 @@
 import { protect } from './authMiddleware';
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import User from '../models/userModel';
+import User from '../schemas/userModel';
 import mockingoose from 'mockingoose';
 import { IUser } from '../interfaces/user';
 
