@@ -9,10 +9,10 @@ import {
   getCarById,
   getFilterOptions,
 } from "./carController";
-import Car from "../models/carModel";
-import { ShippingStatus } from "../interfaces/enums/shippingStatus.enum";
+
 import dotenv from "dotenv";
 import { UpdateResult, DeleteResult } from "mongodb";
+import Car from "../../models/carModel";
 
 dotenv.config({ path: "../../.env" });
 
