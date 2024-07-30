@@ -1,11 +1,14 @@
-# dependencies
+# Dependencies
 node_modules/
+client/node_modules/
+server/node_modules/
 
 # Environment variables
-.env*.local
 .env
+.env.local
+.env.*.local
 
-# Readme
+# Documentation
 Documentation.md
 
 # Coverage directory
@@ -17,3 +20,29 @@ build/
 
 # Logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+
+# Docker files (if Docker files should not be versioned)
+Dockerfile
+.dockerignore
+
+# Miscellaneous
+*.tgz
+*.lock
