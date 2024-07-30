@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { verifyToken } from './userController';
 import jwt from 'jsonwebtoken';
-import User from '../../models/userModel';
+import User from '../../schemas/userModel';
 
 jest.mock('../models/userModel');
 jest.mock('jsonwebtoken');

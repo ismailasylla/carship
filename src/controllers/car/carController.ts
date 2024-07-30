@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import Car from '../../models/carModel';
+import Car from '../../schemas/carModel';
 import { ICar } from '../../interfaces/car';
 import { emitCarUpdate } from '../../server';
 import { ShippingStatus } from '../../interfaces/enums/shippingStatus.enum';

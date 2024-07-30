@@ -12,7 +12,7 @@ import {
 
 import dotenv from "dotenv";
 import { UpdateResult, DeleteResult } from "mongodb";
-import Car from "../../models/carModel";
+import Car from "../../schemas/carModel";
 
 dotenv.config({ path: "../../.env" });
 

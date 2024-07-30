@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { registerUser, loginUser, verifyToken } from '../controllers/userController';
+import { registerUser, loginUser, verifyToken } from '../controllers/auth/userController';
 import { protect } from '../middlewares/authMiddleware';
 
 
