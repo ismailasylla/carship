@@ -11,7 +11,8 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test": "jest",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "COLLECT_COVERAGE=true jest",
+    "test:file": "COLLECT_COVERAGE=false jest"
   },
   "dependencies": {
     "axios": "^1.7.2",

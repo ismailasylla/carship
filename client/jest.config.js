@@ -5,7 +5,7 @@ module.exports = {
   moduleNameMapper: {
     '\\.(css|less)$': 'identity-obj-proxy',
   },
-  collectCoverage: true,
+  collectCoverage: process.env.COLLECT_COVERAGE === 'true',
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
     '!src/**/*.d.ts',
