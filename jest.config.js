@@ -4,7 +4,7 @@ module.exports = {
   moduleNameMapper: {
     '\\.(css|less)$': 'identity-obj-proxy', // Mock CSS and Less modules
   },
-  collectCoverage: true, // Enable coverage collection
+  collectCoverage: process.env.COLLECT_COVERAGE === 'true', // Enable coverage collection based on env variable
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}', // Collect coverage from all TypeScript files in the src folder
     '!src/**/*.d.ts', // Exclude TypeScript declaration files
